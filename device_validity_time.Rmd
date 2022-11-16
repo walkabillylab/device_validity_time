@@ -1,0 +1,153 @@
+---
+title: "Device validity over time"
+author: "Daniel Fuller"
+date: "20/01/2021"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Packages
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+### Reading in data
+
+```{r}
+validity1 <- read_csv("wearable_review_data_validity.csv")
+
+validity <- select(validity1, 1:37, MPE, MAPE)
+
+write_csv(validity, "validity_over_time.csv")
+```
+
+### Reading in data
+
+```{r}
+glimpse(validity)
+```
+
+
+### Removing Xiaomi and Mio (only one year of devices)
+
+```{r}
+validity <- subset(validity, Brand != "Mio" & Brand != "Xiaomi")
+```
+
+
+### Filtering the data for SC
+
+```{r}
+clean_data <- subset(validity, Measured != "EE" & Measured != "HR")
+```
+
+
+### Number of SC validity tests conducted within each brand
+
+```{r}
+table(clean_data$Brand)
+```
+
+There are 7 different brands of commercial wearable devices included in this study. They are: Apple (31 validity tests), Fitbit (673 validity tests), Garmin (169 validity tests), Misfit (42 validity tests), Polar (42 validity tests), Samsung (15 validity tests) and Withings (84 validity tests).
+
+### Number of SC validity tests conducted within each device type per Brand
+
+```{r}
+table(clean_data$device_name)
+```
+
+There are multiple of device types within each brand that were tested for step count validity. Apple has two device types tested: Apple Watch (30 validity tests) and Apple Watch Series 2 (1 validity test). Fitbit has 11 device types: Fitbit (3), Fitbit Charge (21), Fitbit Charge 2 (30), Fitbit Charge HR (76), Fitbit Classic (17), Fitbit Flex (109), Fitbit Force (6), Fitbit One (160), Fitbit Surge (18), Fitbit Ultra (39), Fitbit Zip (194). Garmin has 11 device types: Garmin Forerunner 235 (2), Garmin Forerunner 405CX (1), Garmin Forerunner 735XT (3), Garmin Forerunner 920XT (6), Garmin Vivoactive (6), Garmin Vivofit (81), Garmin Vivofit 2 (11), Garmin Vivofit 3 (6), Garmin Vivosmart (14), Garmin Vivosmart HR (13) and Garmin Vivosmart HR+ (26). Misfit has two device types: Misfit Flash (6) and Misfit Shine (36). Polar has 6 device types: Polar A300 (1), Polar A360 (6), Polar Active (6), Polar Loop (27), Polar M600 (1) and Polar V800 (1). Samsung has 4 device types: Samsung Gear 2 (4), Samsung Gear S (7), Samsung Gear S2 (3) and Samsung Gear S3 (1). Withings has 2 device types: Withings Pulse O2 (50) and Withings Pulse Ox (34).
+
+
+### Number of devices tested for step count per brand and year of release
+
+```{r}
+table(clean_data$Brand, clean_data$device_year)
+
+histo_device_year_Brand <- ggplot(data = clean_data, aes(device_year)) +
+        geom_histogram() +
+        facet_wrap(~ Brand)
+
+plot(histo_device_year_Brand)
+```
+
+
+### Summary of Mean Absolute Percentage Error for SC of all brands
+
+```{r}
+summary(clean_data$MAPE)
+
+histo_MAPE_SC <- ggplot(data = clean_data, aes(MAPE)) +
+        geom_histogram(bins = 45)
+
+plot(histo_MAPE_SC)
+```
+
+The histogram indicates that the MAPE values are not normally distributed and that there is an extreme positive skewness. Majority of the MAPE values lie to the left of the distribution. The mean is likely not be a good measure of central tendency for this data because of the degree of skewness seen in the histogram. Therefore, we will want to use the median value instead.
+
+
+### Scatter plot for SC MAPE for all brands compared to device years of release
+
+```{r}
+scatter_MAPE_year_SC <- ggplot(data = clean_data, aes(x = device_year, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "red") + 
+      stat_smooth()
+
+plot(scatter_MAPE_year_SC)
+
+```
+
+As seen in the above scatter plot, as time (device year of release) increases, the Mean Absolute Percentage Error of Step Count measurement increases. MAPE is representative of accuracy, therefore the accuracy for these commercial wearable devices to measure step count decreases over time. 
+
+
+### Scatter plot for SC MAPE per brand compared to device years of release
+
+```{r}
+scatter_MAPE_year_Brand <- ggplot(data = clean_data, aes(x = device_year, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "red") +
+      facet_wrap(~ Brand)
+
+plot(scatter_MAPE_year_Brand)
+```
+
+As seen in the above figure, the accuracy of wearable devices to measure step count varies by brand. Of the validity tests conducted using Apple devices, there was a decrease in MAPE values between devices released in 2015 and 2016. This indicates that the accuracy of Apple devices increased with the release of a newer version of wearable technology. When analyzing the data for the brand Fitbit, it can be seen that there was an increased in MAPE values between devices released from 2011-2016. This indicates that the accuracy of Fitbit devices decreased with the release of newer versions of wearable technology. A similar trend was seen in Garmin devices released between the years of 2009-2016. The step count accuracy of these devices decreased as well. The brands Misfit and Polar show increases in accuracy in devices released from 2012-2015 and 2013-2015, respectively. Samsung and Withings show decreases in accuracy in devices released from 2014-2016 ans 2013-2014, respectively. 
+
+
+## Linear Regression: Device year as a predictor of Step Count MAPE
+
+```{r}
+lm_year_MAPE <- lm(MAPE ~ device_year, data = clean_data)
+
+summary(lm_year_MAPE)
+```
+
+### Linear Regression: Analyzing SC MAPE with Brand as a predictor
+
+```{r}
+lm_Brand_MAPE <- lm(MAPE ~ Brand, data = clean_data)
+
+
+
+summary(lm_Brand_MAPE)
+```
+
+### Linear Regression: Analyzing differences in SC MAPE with device year and brand as factors
+
+```{r}
+lm_year_Brand_MAPE <- lm(MAPE ~ device_year*Brand, data = clean_data)
+
+
+
+summary(lm_year_Brand_MAPE)
+```
+
+
