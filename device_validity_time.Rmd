@@ -168,19 +168,31 @@ plot(scatter_fitted_year)
 ```{r}
 lm_Brand_MAPE <- lm(MAPE ~ Brand, data = clean_data)
 
-
-
 summary(lm_Brand_MAPE)
 ```
 
 ### Linear Regression: Analyzing differences in SC MAPE with device year and brand as factors
 
 ```{r}
-lm_year_Brand_MAPE <- lm(MAPE ~ device_year*Brand, data = clean_data)
+## MLM Regression: Device year as a predictor of Step Count MAPE and author_year as a random effect
 
+lmer_year_by_brand_MAPE <- lmer(MAPE ~ device_year*Brand + (1 | study_year), data = clean_data)
 
+summary(lmer_year_by_brand_MAPE)
+tbl_regression(lmer_year_by_brand_MAPE)
 
-summary(lm_year_Brand_MAPE)
+predicted_data_brand <- lmer_year_by_brand_MAPE@frame
+predicted_data_brand$fitted <- fitted(lmer_year_by_brand_MAPE)
 ```
+
+```{r}
+scatter_fitted_year_brand <- ggplot(data = predicted_data_brand, aes(x = device_year, y = fitted)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "red") +
+      facet_wrap(~ Brand)
+
+plot(scatter_fitted_year_brand)
+```
+
 
 

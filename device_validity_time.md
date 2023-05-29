@@ -391,12 +391,12 @@ tbl_regression(lm_year_MAPE)
 ```
 
 ```{=html}
-<div id="lqrbythqdd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="zvjskcpnde" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#lqrbythqdd .gt_table {
+#zvjskcpnde .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -421,7 +421,7 @@ tbl_regression(lm_year_MAPE)
   border-left-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_heading {
+#zvjskcpnde .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -433,12 +433,12 @@ tbl_regression(lm_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_caption {
+#zvjskcpnde .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#lqrbythqdd .gt_title {
+#zvjskcpnde .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -450,7 +450,7 @@ tbl_regression(lm_year_MAPE)
   border-bottom-width: 0;
 }
 
-#lqrbythqdd .gt_subtitle {
+#zvjskcpnde .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -462,13 +462,13 @@ tbl_regression(lm_year_MAPE)
   border-top-width: 0;
 }
 
-#lqrbythqdd .gt_bottom_border {
+#zvjskcpnde .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_col_headings {
+#zvjskcpnde .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -483,7 +483,7 @@ tbl_regression(lm_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_col_heading {
+#zvjskcpnde .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -503,7 +503,7 @@ tbl_regression(lm_year_MAPE)
   overflow-x: hidden;
 }
 
-#lqrbythqdd .gt_column_spanner_outer {
+#zvjskcpnde .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -515,15 +515,15 @@ tbl_regression(lm_year_MAPE)
   padding-right: 4px;
 }
 
-#lqrbythqdd .gt_column_spanner_outer:first-child {
+#zvjskcpnde .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lqrbythqdd .gt_column_spanner_outer:last-child {
+#zvjskcpnde .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lqrbythqdd .gt_column_spanner {
+#zvjskcpnde .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -535,7 +535,7 @@ tbl_regression(lm_year_MAPE)
   width: 100%;
 }
 
-#lqrbythqdd .gt_group_heading {
+#zvjskcpnde .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -561,7 +561,7 @@ tbl_regression(lm_year_MAPE)
   text-align: left;
 }
 
-#lqrbythqdd .gt_empty_group_heading {
+#zvjskcpnde .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -576,15 +576,15 @@ tbl_regression(lm_year_MAPE)
   vertical-align: middle;
 }
 
-#lqrbythqdd .gt_from_md > :first-child {
+#zvjskcpnde .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lqrbythqdd .gt_from_md > :last-child {
+#zvjskcpnde .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lqrbythqdd .gt_row {
+#zvjskcpnde .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -603,7 +603,7 @@ tbl_regression(lm_year_MAPE)
   overflow-x: hidden;
 }
 
-#lqrbythqdd .gt_stub {
+#zvjskcpnde .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -616,7 +616,7 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#lqrbythqdd .gt_stub_row_group {
+#zvjskcpnde .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -630,11 +630,11 @@ tbl_regression(lm_year_MAPE)
   vertical-align: top;
 }
 
-#lqrbythqdd .gt_row_group_first td {
+#zvjskcpnde .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#lqrbythqdd .gt_summary_row {
+#zvjskcpnde .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -644,16 +644,16 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#lqrbythqdd .gt_first_summary_row {
+#zvjskcpnde .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_first_summary_row.thick {
+#zvjskcpnde .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#lqrbythqdd .gt_last_summary_row {
+#zvjskcpnde .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -663,7 +663,7 @@ tbl_regression(lm_year_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_grand_summary_row {
+#zvjskcpnde .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -673,7 +673,7 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#lqrbythqdd .gt_first_grand_summary_row {
+#zvjskcpnde .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -683,11 +683,11 @@ tbl_regression(lm_year_MAPE)
   border-top-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_striped {
+#zvjskcpnde .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#lqrbythqdd .gt_table_body {
+#zvjskcpnde .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -696,7 +696,7 @@ tbl_regression(lm_year_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_footnotes {
+#zvjskcpnde .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -710,7 +710,7 @@ tbl_regression(lm_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_footnote {
+#zvjskcpnde .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -719,7 +719,7 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#lqrbythqdd .gt_sourcenotes {
+#zvjskcpnde .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -733,7 +733,7 @@ tbl_regression(lm_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#lqrbythqdd .gt_sourcenote {
+#zvjskcpnde .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -741,64 +741,64 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#lqrbythqdd .gt_left {
+#zvjskcpnde .gt_left {
   text-align: left;
 }
 
-#lqrbythqdd .gt_center {
+#zvjskcpnde .gt_center {
   text-align: center;
 }
 
-#lqrbythqdd .gt_right {
+#zvjskcpnde .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lqrbythqdd .gt_font_normal {
+#zvjskcpnde .gt_font_normal {
   font-weight: normal;
 }
 
-#lqrbythqdd .gt_font_bold {
+#zvjskcpnde .gt_font_bold {
   font-weight: bold;
 }
 
-#lqrbythqdd .gt_font_italic {
+#zvjskcpnde .gt_font_italic {
   font-style: italic;
 }
 
-#lqrbythqdd .gt_super {
+#zvjskcpnde .gt_super {
   font-size: 65%;
 }
 
-#lqrbythqdd .gt_footnote_marks {
+#zvjskcpnde .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#lqrbythqdd .gt_asterisk {
+#zvjskcpnde .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#lqrbythqdd .gt_indent_1 {
+#zvjskcpnde .gt_indent_1 {
   text-indent: 5px;
 }
 
-#lqrbythqdd .gt_indent_2 {
+#zvjskcpnde .gt_indent_2 {
   text-indent: 10px;
 }
 
-#lqrbythqdd .gt_indent_3 {
+#zvjskcpnde .gt_indent_3 {
   text-indent: 15px;
 }
 
-#lqrbythqdd .gt_indent_4 {
+#zvjskcpnde .gt_indent_4 {
   text-indent: 20px;
 }
 
-#lqrbythqdd .gt_indent_5 {
+#zvjskcpnde .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -869,12 +869,12 @@ tbl_regression(lmer_year_MAPE)
 ```
 
 ```{=html}
-<div id="nahtrjrcws" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ilzaztwckg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#nahtrjrcws .gt_table {
+#ilzaztwckg .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -899,7 +899,7 @@ tbl_regression(lmer_year_MAPE)
   border-left-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_heading {
+#ilzaztwckg .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -911,12 +911,12 @@ tbl_regression(lmer_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_caption {
+#ilzaztwckg .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#nahtrjrcws .gt_title {
+#ilzaztwckg .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -928,7 +928,7 @@ tbl_regression(lmer_year_MAPE)
   border-bottom-width: 0;
 }
 
-#nahtrjrcws .gt_subtitle {
+#ilzaztwckg .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -940,13 +940,13 @@ tbl_regression(lmer_year_MAPE)
   border-top-width: 0;
 }
 
-#nahtrjrcws .gt_bottom_border {
+#ilzaztwckg .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_col_headings {
+#ilzaztwckg .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -961,7 +961,7 @@ tbl_regression(lmer_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_col_heading {
+#ilzaztwckg .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -981,7 +981,7 @@ tbl_regression(lmer_year_MAPE)
   overflow-x: hidden;
 }
 
-#nahtrjrcws .gt_column_spanner_outer {
+#ilzaztwckg .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -993,15 +993,15 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 4px;
 }
 
-#nahtrjrcws .gt_column_spanner_outer:first-child {
+#ilzaztwckg .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#nahtrjrcws .gt_column_spanner_outer:last-child {
+#ilzaztwckg .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#nahtrjrcws .gt_column_spanner {
+#ilzaztwckg .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1013,7 +1013,7 @@ tbl_regression(lmer_year_MAPE)
   width: 100%;
 }
 
-#nahtrjrcws .gt_group_heading {
+#ilzaztwckg .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1039,7 +1039,7 @@ tbl_regression(lmer_year_MAPE)
   text-align: left;
 }
 
-#nahtrjrcws .gt_empty_group_heading {
+#ilzaztwckg .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1054,15 +1054,15 @@ tbl_regression(lmer_year_MAPE)
   vertical-align: middle;
 }
 
-#nahtrjrcws .gt_from_md > :first-child {
+#ilzaztwckg .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#nahtrjrcws .gt_from_md > :last-child {
+#ilzaztwckg .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#nahtrjrcws .gt_row {
+#ilzaztwckg .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1081,7 +1081,7 @@ tbl_regression(lmer_year_MAPE)
   overflow-x: hidden;
 }
 
-#nahtrjrcws .gt_stub {
+#ilzaztwckg .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1094,7 +1094,7 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#nahtrjrcws .gt_stub_row_group {
+#ilzaztwckg .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1108,11 +1108,11 @@ tbl_regression(lmer_year_MAPE)
   vertical-align: top;
 }
 
-#nahtrjrcws .gt_row_group_first td {
+#ilzaztwckg .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#nahtrjrcws .gt_summary_row {
+#ilzaztwckg .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1122,16 +1122,16 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#nahtrjrcws .gt_first_summary_row {
+#ilzaztwckg .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_first_summary_row.thick {
+#ilzaztwckg .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#nahtrjrcws .gt_last_summary_row {
+#ilzaztwckg .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1141,7 +1141,7 @@ tbl_regression(lmer_year_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_grand_summary_row {
+#ilzaztwckg .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1151,7 +1151,7 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#nahtrjrcws .gt_first_grand_summary_row {
+#ilzaztwckg .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1161,11 +1161,11 @@ tbl_regression(lmer_year_MAPE)
   border-top-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_striped {
+#ilzaztwckg .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#nahtrjrcws .gt_table_body {
+#ilzaztwckg .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1174,7 +1174,7 @@ tbl_regression(lmer_year_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_footnotes {
+#ilzaztwckg .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1188,7 +1188,7 @@ tbl_regression(lmer_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_footnote {
+#ilzaztwckg .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1197,7 +1197,7 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#nahtrjrcws .gt_sourcenotes {
+#ilzaztwckg .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1211,7 +1211,7 @@ tbl_regression(lmer_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#nahtrjrcws .gt_sourcenote {
+#ilzaztwckg .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1219,64 +1219,64 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#nahtrjrcws .gt_left {
+#ilzaztwckg .gt_left {
   text-align: left;
 }
 
-#nahtrjrcws .gt_center {
+#ilzaztwckg .gt_center {
   text-align: center;
 }
 
-#nahtrjrcws .gt_right {
+#ilzaztwckg .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#nahtrjrcws .gt_font_normal {
+#ilzaztwckg .gt_font_normal {
   font-weight: normal;
 }
 
-#nahtrjrcws .gt_font_bold {
+#ilzaztwckg .gt_font_bold {
   font-weight: bold;
 }
 
-#nahtrjrcws .gt_font_italic {
+#ilzaztwckg .gt_font_italic {
   font-style: italic;
 }
 
-#nahtrjrcws .gt_super {
+#ilzaztwckg .gt_super {
   font-size: 65%;
 }
 
-#nahtrjrcws .gt_footnote_marks {
+#ilzaztwckg .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#nahtrjrcws .gt_asterisk {
+#ilzaztwckg .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#nahtrjrcws .gt_indent_1 {
+#ilzaztwckg .gt_indent_1 {
   text-indent: 5px;
 }
 
-#nahtrjrcws .gt_indent_2 {
+#ilzaztwckg .gt_indent_2 {
   text-indent: 10px;
 }
 
-#nahtrjrcws .gt_indent_3 {
+#ilzaztwckg .gt_indent_3 {
   text-indent: 15px;
 }
 
-#nahtrjrcws .gt_indent_4 {
+#ilzaztwckg .gt_indent_4 {
   text-indent: 20px;
 }
 
-#nahtrjrcws .gt_indent_5 {
+#ilzaztwckg .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1333,8 +1333,6 @@ plot(scatter_fitted_year)
 ```r
 lm_Brand_MAPE <- lm(MAPE ~ Brand, data = clean_data)
 
-
-
 summary(lm_Brand_MAPE)
 ```
 
@@ -1369,43 +1367,560 @@ summary(lm_Brand_MAPE)
 
 
 ```r
-lm_year_Brand_MAPE <- lm(MAPE ~ device_year*Brand, data = clean_data)
+## MLM Regression: Device year as a predictor of Step Count MAPE and author_year as a random effect
 
+lmer_year_by_brand_MAPE <- lmer(MAPE ~ device_year*Brand + (1 | study_year), data = clean_data)
 
-
-summary(lm_year_Brand_MAPE)
+summary(lmer_year_by_brand_MAPE)
 ```
 
 ```
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: MAPE ~ device_year * Brand + (1 | study_year)
+##    Data: clean_data
 ## 
-## Call:
-## lm(formula = MAPE ~ device_year * Brand, data = clean_data)
+## REML criterion at convergence: 8033.3
 ## 
-## Residuals:
+## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -16.689 -10.386  -5.819  -0.359  89.484 
+## -2.8694 -0.2380 -0.0851  0.0301  5.2897 
 ## 
-## Coefficients:
-##                             Estimate Std. Error t value Pr(>|t|)
-## (Intercept)                2535.8664 40209.9140   0.063    0.950
-## device_year                  -1.2577    19.9548  -0.063    0.950
-## BrandFitbit               -1483.9445 40224.6850  -0.037    0.971
-## BrandGarmin                 599.4066 40355.8828   0.015    0.988
-## BrandMisfit                8607.2019 40623.0304   0.212    0.832
-## BrandPolar                -2678.1487 40541.0294  -0.066    0.947
-## BrandSamsung              -1428.5308 43657.8724  -0.033    0.974
-## BrandWithings             21769.5703 41264.4039   0.528    0.598
-## device_year:BrandFitbit       0.7403    19.9622   0.037    0.970
-## device_year:BrandGarmin      -0.2964    20.0273  -0.015    0.988
-## device_year:BrandMisfit      -4.2723    20.1604  -0.212    0.832
-## device_year:BrandPolar        1.3313    20.1195   0.066    0.947
-## device_year:BrandSamsung      0.7091    21.6671   0.033    0.974
-## device_year:BrandWithings   -10.8099    20.4790  -0.528    0.598
+## Random effects:
+##  Groups     Name        Variance Std.Dev.
+##  study_year (Intercept) 119.6    10.94   
+##  Residual               230.1    15.17   
+## Number of obs: 962, groups:  study_year, 104
 ## 
-## Residual standard error: 19.5 on 948 degrees of freedom
-##   (94 observations deleted due to missingness)
-## Multiple R-squared:  0.03304,	Adjusted R-squared:  0.01978 
-## F-statistic: 2.492 on 13 and 948 DF,  p-value: 0.002371
+## Fixed effects:
+##                             Estimate Std. Error t value
+## (Intercept)                6142.7699 35807.9215   0.172
+## device_year                  -3.0450    17.7702  -0.171
+## BrandFitbit               -6707.5061 35844.8048  -0.187
+## BrandGarmin               -6980.5844 35976.2385  -0.194
+## BrandMisfit               -5322.8304 36321.4983  -0.147
+## BrandPolar                -9757.6599 36307.5482  -0.269
+## BrandSamsung              -1085.1810 36220.8861  -0.030
+## BrandWithings             -1125.8147 37000.7443  -0.030
+## device_year:BrandFitbit       3.3302    17.7886   0.187
+## device_year:BrandGarmin       3.4646    17.8538   0.194
+## device_year:BrandMisfit       2.6422    18.0256   0.147
+## device_year:BrandPolar        4.8461    18.0186   0.269
+## device_year:BrandSamsung      0.5385    17.9757   0.030
+## device_year:BrandWithings     0.5584    18.3631   0.030
 ```
+
+```
+## 
+## Correlation matrix not shown by default, as p = 14 > 12.
+## Use print(x, correlation=TRUE)  or
+##     vcov(x)        if you need it
+```
+
+```r
+tbl_regression(lmer_year_by_brand_MAPE)
+```
+
+```{=html}
+<div id="oezbvmcenz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#oezbvmcenz .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#oezbvmcenz .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#oezbvmcenz .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#oezbvmcenz .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#oezbvmcenz .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#oezbvmcenz .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#oezbvmcenz .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#oezbvmcenz .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#oezbvmcenz .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#oezbvmcenz .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#oezbvmcenz .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#oezbvmcenz .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#oezbvmcenz .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#oezbvmcenz .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#oezbvmcenz .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#oezbvmcenz .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#oezbvmcenz .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#oezbvmcenz .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#oezbvmcenz .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#oezbvmcenz .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#oezbvmcenz .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#oezbvmcenz .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#oezbvmcenz .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#oezbvmcenz .gt_left {
+  text-align: left;
+}
+
+#oezbvmcenz .gt_center {
+  text-align: center;
+}
+
+#oezbvmcenz .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#oezbvmcenz .gt_font_normal {
+  font-weight: normal;
+}
+
+#oezbvmcenz .gt_font_bold {
+  font-weight: bold;
+}
+
+#oezbvmcenz .gt_font_italic {
+  font-style: italic;
+}
+
+#oezbvmcenz .gt_super {
+  font-size: 65%;
+}
+
+#oezbvmcenz .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#oezbvmcenz .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#oezbvmcenz .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#oezbvmcenz .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#oezbvmcenz .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#oezbvmcenz .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#oezbvmcenz .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Beta&lt;/strong&gt;"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;sup class=&quot;gt_footnote_marks&quot;&gt;1&lt;/sup&gt;"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">device_year</td>
+<td headers="estimate" class="gt_row gt_center">-3.0</td>
+<td headers="ci" class="gt_row gt_center">-38, 32</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Brand</td>
+<td headers="estimate" class="gt_row gt_center"></td>
+<td headers="ci" class="gt_row gt_center"></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Apple</td>
+<td headers="estimate" class="gt_row gt_center">—</td>
+<td headers="ci" class="gt_row gt_center">—</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Fitbit</td>
+<td headers="estimate" class="gt_row gt_center">-6,708</td>
+<td headers="ci" class="gt_row gt_center">-76,962, 63,547</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Garmin</td>
+<td headers="estimate" class="gt_row gt_center">-6,981</td>
+<td headers="ci" class="gt_row gt_center">-77,493, 63,532</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Misfit</td>
+<td headers="estimate" class="gt_row gt_center">-5,323</td>
+<td headers="ci" class="gt_row gt_center">-76,512, 65,866</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Polar</td>
+<td headers="estimate" class="gt_row gt_center">-9,758</td>
+<td headers="ci" class="gt_row gt_center">-80,919, 61,404</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Samsung</td>
+<td headers="estimate" class="gt_row gt_center">-1,085</td>
+<td headers="ci" class="gt_row gt_center">-72,077, 69,906</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Withings</td>
+<td headers="estimate" class="gt_row gt_center">-1,126</td>
+<td headers="ci" class="gt_row gt_center">-73,646, 71,394</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">device_year * Brand</td>
+<td headers="estimate" class="gt_row gt_center"></td>
+<td headers="ci" class="gt_row gt_center"></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    device_year * Fitbit</td>
+<td headers="estimate" class="gt_row gt_center">3.3</td>
+<td headers="ci" class="gt_row gt_center">-32, 38</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    device_year * Garmin</td>
+<td headers="estimate" class="gt_row gt_center">3.5</td>
+<td headers="ci" class="gt_row gt_center">-32, 38</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    device_year * Misfit</td>
+<td headers="estimate" class="gt_row gt_center">2.6</td>
+<td headers="ci" class="gt_row gt_center">-33, 38</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    device_year * Polar</td>
+<td headers="estimate" class="gt_row gt_center">4.8</td>
+<td headers="ci" class="gt_row gt_center">-30, 40</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    device_year * Samsung</td>
+<td headers="estimate" class="gt_row gt_center">0.54</td>
+<td headers="ci" class="gt_row gt_center">-35, 36</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    device_year * Withings</td>
+<td headers="estimate" class="gt_row gt_center">0.56</td>
+<td headers="ci" class="gt_row gt_center">-35, 37</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="3"><sup class="gt_footnote_marks">1</sup> CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+```
+
+```r
+predicted_data_brand <- lmer_year_by_brand_MAPE@frame
+predicted_data_brand$fitted <- fitted(lmer_year_by_brand_MAPE)
+```
+
+
+```r
+scatter_fitted_year_brand <- ggplot(data = predicted_data_brand, aes(x = device_year, y = fitted)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "red") +
+      facet_wrap(~ Brand)
+
+plot(scatter_fitted_year_brand)
+```
+
+```
+## `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](device_validity_time_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+
 
 
