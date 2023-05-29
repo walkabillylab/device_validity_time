@@ -16,6 +16,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(readxl)
+library(lme4)
+library(gtsummary)
 ```
 
 ### Reading in data
@@ -26,6 +28,11 @@ validity1 <- read_csv("wearable_review_data_validity.csv")
 validity <- select(validity1, 1:37, MPE, MAPE)
 
 write_csv(validity, "validity_over_time.csv")
+
+validity <- validity %>% 
+  mutate(MAPE = ifelse(is.na(MAPE),
+                            abs(MPE*100),
+                            MAPE))
 ```
 
 ### Reading in data
@@ -41,11 +48,15 @@ glimpse(validity)
 validity <- subset(validity, Brand != "Mio" & Brand != "Xiaomi")
 ```
 
-
 ### Filtering the data for SC
 
 ```{r}
 clean_data <- subset(validity, Measured != "EE" & Measured != "HR")
+
+### Create study_year variable
+
+clean_data$study_year <- str_c(clean_data$Author, clean_data$Year, sep = "_")
+length(clean_data$study_year)
 ```
 
 
@@ -102,7 +113,6 @@ scatter_MAPE_year_SC <- ggplot(data = clean_data, aes(x = device_year, y = MAPE)
       stat_smooth()
 
 plot(scatter_MAPE_year_SC)
-
 ```
 
 As seen in the above scatter plot, as time (device year of release) increases, the Mean Absolute Percentage Error of Step Count measurement increases. MAPE is representative of accuracy, therefore the accuracy for these commercial wearable devices to measure step count decreases over time. 
@@ -121,14 +131,37 @@ plot(scatter_MAPE_year_Brand)
 
 As seen in the above figure, the accuracy of wearable devices to measure step count varies by brand. Of the validity tests conducted using Apple devices, there was a decrease in MAPE values between devices released in 2015 and 2016. This indicates that the accuracy of Apple devices increased with the release of a newer version of wearable technology. When analyzing the data for the brand Fitbit, it can be seen that there was an increased in MAPE values between devices released from 2011-2016. This indicates that the accuracy of Fitbit devices decreased with the release of newer versions of wearable technology. A similar trend was seen in Garmin devices released between the years of 2009-2016. The step count accuracy of these devices decreased as well. The brands Misfit and Polar show increases in accuracy in devices released from 2012-2015 and 2013-2015, respectively. Samsung and Withings show decreases in accuracy in devices released from 2014-2016 ans 2013-2014, respectively. 
 
-
 ## Linear Regression: Device year as a predictor of Step Count MAPE
 
 ```{r}
 lm_year_MAPE <- lm(MAPE ~ device_year, data = clean_data)
 
 summary(lm_year_MAPE)
+tbl_regression(lm_year_MAPE)
 ```
+
+## MLM Regression: Device year as a predictor of Step Count MAPE and author_year as a random effect
+
+```{r}
+lmer_year_MAPE <- lmer(MAPE ~ device_year + (1 | study_year), data = clean_data)
+
+summary(lmer_year_MAPE)
+tbl_regression(lmer_year_MAPE)
+
+predicted_data <- lmer_year_MAPE@frame
+predicted_data$fitted <- fitted(lmer_year_MAPE)
+```
+
+## Scatter plot of fitted values
+
+```{r}
+scatter_fitted_year <- ggplot(data = predicted_data, aes(x = device_year, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "red") 
+
+plot(scatter_fitted_year)
+```
+
 
 ### Linear Regression: Analyzing SC MAPE with Brand as a predictor
 

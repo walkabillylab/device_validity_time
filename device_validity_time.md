@@ -21,7 +21,7 @@ library(tidyverse)
 ```
 
 ```
-## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+## ✔ ggplot2 3.4.0     ✔ purrr   0.3.4
 ## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
 ## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
 ## ✔ readr   2.1.2     ✔ forcats 0.5.1
@@ -35,6 +35,26 @@ library(tidyverse)
 
 ```r
 library(readxl)
+library(lme4)
+```
+
+```
+## Loading required package: Matrix
+```
+
+```
+## 
+## Attaching package: 'Matrix'
+```
+
+```
+## The following objects are masked from 'package:tidyr':
+## 
+##     expand, pack, unpack
+```
+
+```r
+library(gtsummary)
 ```
 
 ### Reading in data
@@ -60,6 +80,11 @@ validity1 <- read_csv("wearable_review_data_validity.csv")
 validity <- select(validity1, 1:37, MPE, MAPE)
 
 write_csv(validity, "validity_over_time.csv")
+
+validity <- validity %>% 
+  mutate(MAPE = ifelse(is.na(MAPE),
+                            abs(MPE*100),
+                            MAPE))
 ```
 
 ### Reading in data
@@ -121,12 +146,20 @@ glimpse(validity)
 validity <- subset(validity, Brand != "Mio" & Brand != "Xiaomi")
 ```
 
-
 ### Filtering the data for SC
 
 
 ```r
 clean_data <- subset(validity, Measured != "EE" & Measured != "HR")
+
+### Create study_year variable
+
+clean_data$study_year <- str_c(clean_data$Author, clean_data$Year, sep = "_")
+length(clean_data$study_year)
+```
+
+```
+## [1] 1056
 ```
 
 
@@ -217,7 +250,7 @@ plot(histo_device_year_Brand)
 ```
 
 ```
-## Warning: Removed 3 rows containing non-finite values (stat_bin).
+## Warning: Removed 3 rows containing non-finite values (`stat_bin()`).
 ```
 
 ![](device_validity_time_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
@@ -232,7 +265,7 @@ summary(clean_data$MAPE)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-##  0.0000  0.0250  0.0685  0.1825  0.1723  5.9590     684
+##   0.000   0.069   0.600   9.142   6.900 100.000      91
 ```
 
 ```r
@@ -243,7 +276,7 @@ plot(histo_MAPE_SC)
 ```
 
 ```
-## Warning: Removed 684 rows containing non-finite values (stat_bin).
+## Warning: Removed 91 rows containing non-finite values (`stat_bin()`).
 ```
 
 ![](device_validity_time_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
@@ -264,28 +297,29 @@ plot(scatter_MAPE_year_SC)
 ```
 
 ```
-## `geom_smooth()` using formula 'y ~ x'
+## `geom_smooth()` using formula = 'y ~ x'
 ```
 
 ```
-## Warning: Removed 684 rows containing non-finite values (stat_smooth).
+## Warning: Removed 94 rows containing non-finite values (`stat_smooth()`).
 ```
 
 ```
-## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
+## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
 ```
 
 ```
-## Warning: Removed 684 rows containing non-finite values (stat_smooth).
+## Warning: Removed 94 rows containing non-finite values (`stat_smooth()`).
 ```
 
 ```
-## Warning: Computation failed in `stat_smooth()`:
-## x has insufficient unique values to support 10 knots: reduce k.
+## Warning: Computation failed in `stat_smooth()`
+## Caused by error in `smooth.construct.cr.smooth.spec()`:
+## ! x has insufficient unique values to support 10 knots: reduce k.
 ```
 
 ```
-## Warning: Removed 684 rows containing missing values (geom_point).
+## Warning: Removed 94 rows containing missing values (`geom_point()`).
 ```
 
 ![](device_validity_time_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
@@ -306,21 +340,20 @@ plot(scatter_MAPE_year_Brand)
 ```
 
 ```
-## `geom_smooth()` using formula 'y ~ x'
+## `geom_smooth()` using formula = 'y ~ x'
 ```
 
 ```
-## Warning: Removed 684 rows containing non-finite values (stat_smooth).
+## Warning: Removed 94 rows containing non-finite values (`stat_smooth()`).
 ```
 
 ```
-## Warning: Removed 684 rows containing missing values (geom_point).
+## Warning: Removed 94 rows containing missing values (`geom_point()`).
 ```
 
 ![](device_validity_time_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 As seen in the above figure, the accuracy of wearable devices to measure step count varies by brand. Of the validity tests conducted using Apple devices, there was a decrease in MAPE values between devices released in 2015 and 2016. This indicates that the accuracy of Apple devices increased with the release of a newer version of wearable technology. When analyzing the data for the brand Fitbit, it can be seen that there was an increased in MAPE values between devices released from 2011-2016. This indicates that the accuracy of Fitbit devices decreased with the release of newer versions of wearable technology. A similar trend was seen in Garmin devices released between the years of 2009-2016. The step count accuracy of these devices decreased as well. The brands Misfit and Polar show increases in accuracy in devices released from 2012-2015 and 2013-2015, respectively. Samsung and Withings show decreases in accuracy in devices released from 2014-2016 ans 2013-2014, respectively. 
-
 
 ## Linear Regression: Device year as a predictor of Step Count MAPE
 
@@ -338,20 +371,961 @@ summary(lm_year_MAPE)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -0.2993 -0.1463 -0.0800  0.0113  5.6883 
+## -16.889  -9.488  -6.472  -2.376  90.448 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) -120.45473   32.44069  -3.713 0.000236 ***
-## device_year    0.05991    0.01611   3.719 0.000231 ***
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 3096.0530   886.6980   3.492 0.000502 ***
+## device_year   -1.5333     0.4404  -3.481 0.000521 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.4438 on 370 degrees of freedom
-##   (684 observations deleted due to missingness)
-## Multiple R-squared:  0.03603,	Adjusted R-squared:  0.03342 
-## F-statistic: 13.83 on 1 and 370 DF,  p-value: 0.0002313
+## Residual standard error: 19.58 on 960 degrees of freedom
+##   (94 observations deleted due to missingness)
+## Multiple R-squared:  0.01247,	Adjusted R-squared:  0.01144 
+## F-statistic: 12.12 on 1 and 960 DF,  p-value: 0.0005213
 ```
+
+```r
+tbl_regression(lm_year_MAPE)
+```
+
+```{=html}
+<div id="lqrbythqdd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#lqrbythqdd .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#lqrbythqdd .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#lqrbythqdd .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#lqrbythqdd .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#lqrbythqdd .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#lqrbythqdd .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#lqrbythqdd .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#lqrbythqdd .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#lqrbythqdd .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#lqrbythqdd .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#lqrbythqdd .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#lqrbythqdd .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#lqrbythqdd .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#lqrbythqdd .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lqrbythqdd .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#lqrbythqdd .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#lqrbythqdd .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lqrbythqdd .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#lqrbythqdd .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lqrbythqdd .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#lqrbythqdd .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lqrbythqdd .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lqrbythqdd .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lqrbythqdd .gt_left {
+  text-align: left;
+}
+
+#lqrbythqdd .gt_center {
+  text-align: center;
+}
+
+#lqrbythqdd .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#lqrbythqdd .gt_font_normal {
+  font-weight: normal;
+}
+
+#lqrbythqdd .gt_font_bold {
+  font-weight: bold;
+}
+
+#lqrbythqdd .gt_font_italic {
+  font-style: italic;
+}
+
+#lqrbythqdd .gt_super {
+  font-size: 65%;
+}
+
+#lqrbythqdd .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#lqrbythqdd .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#lqrbythqdd .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#lqrbythqdd .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#lqrbythqdd .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#lqrbythqdd .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#lqrbythqdd .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Beta&lt;/strong&gt;"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;sup class=&quot;gt_footnote_marks&quot;&gt;1&lt;/sup&gt;"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;p-value&lt;/strong&gt;"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">device_year</td>
+<td headers="estimate" class="gt_row gt_center">-1.5</td>
+<td headers="ci" class="gt_row gt_center">-2.4, -0.67</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><sup class="gt_footnote_marks">1</sup> CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+```
+
+## MLM Regression: Device year as a predictor of Step Count MAPE and author_year as a random effect
+
+
+```r
+lmer_year_MAPE <- lmer(MAPE ~ device_year + (1 | study_year), data = clean_data)
+
+summary(lmer_year_MAPE)
+```
+
+```
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: MAPE ~ device_year + (1 | study_year)
+##    Data: clean_data
+## 
+## REML criterion at convergence: 8089.8
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.7824 -0.2363 -0.0751 -0.0117  5.2967 
+## 
+## Random effects:
+##  Groups     Name        Variance Std.Dev.
+##  study_year (Intercept) 118.6    10.89   
+##  Residual               228.2    15.11   
+## Number of obs: 962, groups:  study_year, 104
+## 
+## Fixed effects:
+##               Estimate Std. Error t value
+## (Intercept)  173.97539 1237.90022   0.141
+## device_year   -0.08193    0.61490  -0.133
+## 
+## Correlation of Fixed Effects:
+##             (Intr)
+## device_year -1.000
+```
+
+```r
+tbl_regression(lmer_year_MAPE)
+```
+
+```{=html}
+<div id="nahtrjrcws" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#nahtrjrcws .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#nahtrjrcws .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#nahtrjrcws .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#nahtrjrcws .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#nahtrjrcws .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#nahtrjrcws .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#nahtrjrcws .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#nahtrjrcws .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#nahtrjrcws .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#nahtrjrcws .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#nahtrjrcws .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#nahtrjrcws .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#nahtrjrcws .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#nahtrjrcws .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nahtrjrcws .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#nahtrjrcws .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#nahtrjrcws .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nahtrjrcws .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#nahtrjrcws .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nahtrjrcws .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#nahtrjrcws .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nahtrjrcws .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#nahtrjrcws .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nahtrjrcws .gt_left {
+  text-align: left;
+}
+
+#nahtrjrcws .gt_center {
+  text-align: center;
+}
+
+#nahtrjrcws .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#nahtrjrcws .gt_font_normal {
+  font-weight: normal;
+}
+
+#nahtrjrcws .gt_font_bold {
+  font-weight: bold;
+}
+
+#nahtrjrcws .gt_font_italic {
+  font-style: italic;
+}
+
+#nahtrjrcws .gt_super {
+  font-size: 65%;
+}
+
+#nahtrjrcws .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#nahtrjrcws .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#nahtrjrcws .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#nahtrjrcws .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#nahtrjrcws .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#nahtrjrcws .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#nahtrjrcws .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Beta&lt;/strong&gt;"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;sup class=&quot;gt_footnote_marks&quot;&gt;1&lt;/sup&gt;"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">device_year</td>
+<td headers="estimate" class="gt_row gt_center">-0.08</td>
+<td headers="ci" class="gt_row gt_center">-1.3, 1.1</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="3"><sup class="gt_footnote_marks">1</sup> CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+```
+
+```r
+predicted_data <- lmer_year_MAPE@frame
+predicted_data$fitted <- fitted(lmer_year_MAPE)
+```
+
+## Scatter plot of fitted values
+
+
+```r
+scatter_fitted_year <- ggplot(data = predicted_data, aes(x = device_year, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "red") 
+
+plot(scatter_fitted_year)
+```
+
+```
+## `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](device_validity_time_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+
 
 ### Linear Regression: Analyzing SC MAPE with Brand as a predictor
 
@@ -371,24 +1345,24 @@ summary(lm_Brand_MAPE)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -0.5278 -0.1491 -0.0953  0.0072  5.7881 
+## -14.261 -10.363  -6.054  -1.105  91.020 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)     0.5278     0.1245   4.239 2.84e-05 ***
-## BrandFitbit    -0.3569     0.1283  -2.781  0.00570 ** 
-## BrandGarmin    -0.3672     0.1373  -2.674  0.00783 ** 
-## BrandMisfit    -0.4219     0.1546  -2.730  0.00665 ** 
-## BrandPolar     -0.3757     0.1570  -2.393  0.01722 *  
-## BrandSamsung   -0.4695     0.2104  -2.231  0.02628 *  
-## BrandWithings  -0.2763     0.1442  -1.915  0.05621 .  
+##               Estimate Std. Error t value Pr(>|t|)  
+## (Intercept)     1.6205     4.1629   0.389   0.6972  
+## BrandFitbit     8.9332     4.2360   2.109   0.0352 *
+## BrandGarmin     3.0546     4.4596   0.685   0.4935  
+## BrandMisfit    12.6429     5.1603   2.450   0.0145 *
+## BrandPolar      4.3828     5.1603   0.849   0.3959  
+## BrandSamsung    0.7186     6.5381   0.110   0.9125  
+## BrandWithings   7.1992     4.7272   1.523   0.1281  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.4489 on 365 degrees of freedom
-##   (684 observations deleted due to missingness)
-## Multiple R-squared:  0.02721,	Adjusted R-squared:  0.01122 
-## F-statistic: 1.702 on 6 and 365 DF,  p-value: 0.1195
+## Residual standard error: 19.53 on 958 degrees of freedom
+##   (91 observations deleted due to missingness)
+## Multiple R-squared:  0.02048,	Adjusted R-squared:  0.01435 
+## F-statistic: 3.338 on 6 and 958 DF,  p-value: 0.002927
 ```
 
 ### Linear Regression: Analyzing differences in SC MAPE with device year and brand as factors
@@ -409,29 +1383,29 @@ summary(lm_year_Brand_MAPE)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -0.5367 -0.1400 -0.0431  0.0151  5.6837 
+## -16.689 -10.386  -5.819  -0.359  89.484 
 ## 
 ## Coefficients:
 ##                             Estimate Std. Error t value Pr(>|t|)
-## (Intercept)                2.358e+02  9.192e+02   0.256    0.798
-## device_year               -1.167e-01  4.562e-01  -0.256    0.798
-## BrandFitbit               -3.541e+02  9.201e+02  -0.385    0.701
-## BrandGarmin               -3.912e+02  9.247e+02  -0.423    0.673
-## BrandMisfit               -2.315e+02  9.296e+02  -0.249    0.803
-## BrandPolar                -1.518e+02  9.757e+02  -0.156    0.876
-## BrandSamsung              -4.140e+02  1.036e+03  -0.400    0.690
-## BrandWithings             -1.305e+03  9.639e+02  -1.354    0.177
-## device_year:BrandFitbit    1.756e-01  4.566e-01   0.385    0.701
-## device_year:BrandGarmin    1.940e-01  4.589e-01   0.423    0.673
-## device_year:BrandMisfit    1.147e-01  4.613e-01   0.249    0.804
-## device_year:BrandPolar     7.509e-02  4.843e-01   0.155    0.877
-## device_year:BrandSamsung   2.052e-01  5.139e-01   0.399    0.690
-## device_year:BrandWithings  6.481e-01  4.784e-01   1.355    0.176
+## (Intercept)                2535.8664 40209.9140   0.063    0.950
+## device_year                  -1.2577    19.9548  -0.063    0.950
+## BrandFitbit               -1483.9445 40224.6850  -0.037    0.971
+## BrandGarmin                 599.4066 40355.8828   0.015    0.988
+## BrandMisfit                8607.2019 40623.0304   0.212    0.832
+## BrandPolar                -2678.1487 40541.0294  -0.066    0.947
+## BrandSamsung              -1428.5308 43657.8724  -0.033    0.974
+## BrandWithings             21769.5703 41264.4039   0.528    0.598
+## device_year:BrandFitbit       0.7403    19.9622   0.037    0.970
+## device_year:BrandGarmin      -0.2964    20.0273  -0.015    0.988
+## device_year:BrandMisfit      -4.2723    20.1604  -0.212    0.832
+## device_year:BrandPolar        1.3313    20.1195   0.066    0.947
+## device_year:BrandSamsung      0.7091    21.6671   0.033    0.974
+## device_year:BrandWithings   -10.8099    20.4790  -0.528    0.598
 ## 
-## Residual standard error: 0.4383 on 358 degrees of freedom
-##   (684 observations deleted due to missingness)
-## Multiple R-squared:  0.09027,	Adjusted R-squared:  0.05724 
-## F-statistic: 2.733 on 13 and 358 DF,  p-value: 0.001052
+## Residual standard error: 19.5 on 948 degrees of freedom
+##   (94 observations deleted due to missingness)
+## Multiple R-squared:  0.03304,	Adjusted R-squared:  0.01978 
+## F-statistic: 2.492 on 13 and 948 DF,  p-value: 0.002371
 ```
 
 
