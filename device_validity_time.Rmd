@@ -16,8 +16,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(readxl)
+library(broom)
+library(broom.mixed)
 library(lme4)
+library(rstatix)
 library(gtsummary)
+library(knitr)
 ```
 
 ### Reading in data
@@ -46,6 +50,12 @@ glimpse(validity)
 
 ```{r}
 validity <- subset(validity, Brand != "Mio" & Brand != "Xiaomi")
+```
+
+### Removing years prior to 2011
+
+```{r}
+validity <- subset(validity, device_year != "2008" & device_year != "2009")
 ```
 
 ### Filtering the data for SC
@@ -80,7 +90,8 @@ There are multiple of device types within each brand that were tested for step c
 ### Number of devices tested for step count per brand and year of release
 
 ```{r}
-table(clean_data$Brand, clean_data$device_year)
+brand_time <- table(clean_data$Brand, clean_data$device_year)
+kable(brand_time)
 
 histo_device_year_Brand <- ggplot(data = clean_data, aes(device_year)) +
         geom_histogram() +
@@ -89,14 +100,26 @@ histo_device_year_Brand <- ggplot(data = clean_data, aes(device_year)) +
 plot(histo_device_year_Brand)
 ```
 
-
 ### Summary of Mean Absolute Percentage Error for SC of all brands
 
 ```{r}
 summary(clean_data$MAPE)
 
+mape_time <- clean_data %>%
+    group_by(device_year) %>%
+    get_summary_stats(MAPE, type = "mean_sd") %>%
+    arrange(device_year)
+kable(mape_time)
+
+mape_time_brand <- clean_data %>%
+    group_by(Brand, device_year) %>%
+    get_summary_stats(MAPE, type = "mean_sd") %>%
+    arrange(Brand, device_year)
+kable(mape_time_brand)
+
 histo_MAPE_SC <- ggplot(data = clean_data, aes(MAPE)) +
-        geom_histogram(bins = 45)
+        geom_histogram(bins = 45) + 
+        theme_bw()
 
 plot(histo_MAPE_SC)
 ```
@@ -109,8 +132,9 @@ The histogram indicates that the MAPE values are not normally distributed and th
 ```{r}
 scatter_MAPE_year_SC <- ggplot(data = clean_data, aes(x = device_year, y = MAPE)) +
       geom_point(alpha = 0.2) +
-      stat_smooth(method = "lm", colour = "red") + 
-      stat_smooth()
+      stat_smooth(method = "lm", colour = "gray") + 
+      stat_smooth() + 
+      theme_classic()
 
 plot(scatter_MAPE_year_SC)
 ```
@@ -123,27 +147,59 @@ As seen in the above scatter plot, as time (device year of release) increases, t
 ```{r}
 scatter_MAPE_year_Brand <- ggplot(data = clean_data, aes(x = device_year, y = MAPE)) +
       geom_point(alpha = 0.2) +
-      stat_smooth(method = "lm", colour = "red") +
-      facet_wrap(~ Brand)
+      stat_smooth(method = "lm", colour = "gray") +
+      facet_wrap(~ Brand) +
+      theme_bw()
 
 plot(scatter_MAPE_year_Brand)
 ```
 
 As seen in the above figure, the accuracy of wearable devices to measure step count varies by brand. Of the validity tests conducted using Apple devices, there was a decrease in MAPE values between devices released in 2015 and 2016. This indicates that the accuracy of Apple devices increased with the release of a newer version of wearable technology. When analyzing the data for the brand Fitbit, it can be seen that there was an increased in MAPE values between devices released from 2011-2016. This indicates that the accuracy of Fitbit devices decreased with the release of newer versions of wearable technology. A similar trend was seen in Garmin devices released between the years of 2009-2016. The step count accuracy of these devices decreased as well. The brands Misfit and Polar show increases in accuracy in devices released from 2012-2015 and 2013-2015, respectively. Samsung and Withings show decreases in accuracy in devices released from 2014-2016 ans 2013-2014, respectively. 
 
+## Recoding device year as continuous 
+
+```{r}
+clean_data <- clean_data %>%
+	mutate(device_year_c = case_when(
+		device_year == 2011 ~ 1,
+		device_year == 2012 ~ 2,
+		device_year == 2013 ~ 3,
+		device_year == 2014 ~ 4,
+		device_year == 2015 ~ 5,
+		device_year == 2016 ~ 6,
+	))
+summary(clean_data$device_year_c)
+```
+
 ## Linear Regression: Device year as a predictor of Step Count MAPE
 
 ```{r}
-lm_year_MAPE <- lm(MAPE ~ device_year, data = clean_data)
+lm_year_MAPE <- lm(MAPE ~ device_year_c, data = clean_data)
 
 summary(lm_year_MAPE)
-tbl_regression(lm_year_MAPE)
+```
+
+## Linear Regression: Device year as a predictor of Step Count MAPE + Wear location control
+
+```{r}
+lm_year_MAPE_loc <- lm(MAPE ~ device_year_c + Wear_Location, data = clean_data, na.action = na.exclude)
+
+summary(lm_year_MAPE_loc)
+
+clean_data$lm_year_MAPE_loc <- lm_year_MAPE_loc$fitted.values
+
+scatter_fitted_year <- ggplot(data = predicted_data, aes(x = device_year_c, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "gray") +
+      theme_bw()
+
+plot(scatter_fitted_year)
 ```
 
 ## MLM Regression: Device year as a predictor of Step Count MAPE and author_year as a random effect
 
 ```{r}
-lmer_year_MAPE <- lmer(MAPE ~ device_year + (1 | study_year), data = clean_data)
+lmer_year_MAPE <- lmer(MAPE ~ device_year_c, data = clean_data)
 
 summary(lmer_year_MAPE)
 tbl_regression(lmer_year_MAPE)
@@ -155,9 +211,10 @@ predicted_data$fitted <- fitted(lmer_year_MAPE)
 ## Scatter plot of fitted values
 
 ```{r}
-scatter_fitted_year <- ggplot(data = predicted_data, aes(x = device_year, y = MAPE)) +
+scatter_fitted_year <- ggplot(data = predicted_data, aes(x = device_year_c, y = MAPE)) +
       geom_point(alpha = 0.2) +
-      stat_smooth(method = "lm", colour = "red") 
+      stat_smooth(method = "lm", colour = "gray") +
+      theme_bw()
 
 plot(scatter_fitted_year)
 ```
@@ -176,23 +233,44 @@ summary(lm_Brand_MAPE)
 ```{r}
 ## MLM Regression: Device year as a predictor of Step Count MAPE and author_year as a random effect
 
-lmer_year_by_brand_MAPE <- lmer(MAPE ~ device_year*Brand + (1 | study_year), data = clean_data)
+lmer_year_by_brand_MAPE <- lm(MAPE ~ device_year*Brand, data = clean_data)
 
 summary(lmer_year_by_brand_MAPE)
-tbl_regression(lmer_year_by_brand_MAPE)
+lmer_year_by_brand_MAPE_table <- tbl_regression(lmer_year_by_brand_MAPE)
+lmer_year_by_brand_MAPE_table %>% as_kable()
 
-predicted_data_brand <- lmer_year_by_brand_MAPE@frame
-predicted_data_brand$fitted <- fitted(lmer_year_by_brand_MAPE)
+#predicted_data_brand <- lmer_year_by_brand_MAPE@frame
+#predicted_data_brand$fitted <- fitted(lmer_year_by_brand_MAPE)
 ```
 
 ```{r}
-scatter_fitted_year_brand <- ggplot(data = predicted_data_brand, aes(x = device_year, y = fitted)) +
+#scatter_fitted_year_brand <- ggplot(data = predicted_data_brand, aes(x = device_year, y = fitted)) +
       geom_point(alpha = 0.2) +
       stat_smooth(method = "lm", colour = "red") +
-      facet_wrap(~ Brand)
+      facet_wrap(~ Brand) +
+      theme_bw()
 
-plot(scatter_fitted_year_brand)
+#plot(scatter_fitted_year_brand)
 ```
 
+## Subset of Fitbit data
 
+```{r}
+clean_data_fitbit <- subset(clean_data, Brand == "Fitbit")
+```
 
+### Linear Regression: Device year as a predictor of Step Count MAPE
+
+```{r}
+lm_year_MAPE_fb <- lm(MAPE ~ device_year_c, data = clean_data_fitbit)
+
+summary(lm_year_MAPE_fb)
+```
+
+### Linear Regression: Device year as a predictor of Step Count MAPE + Wear location control
+
+```{r}
+lm_year_MAPE_loc_fb <- lm(MAPE ~ device_year_c + Wear_Location, data = clean_data_fitbit)
+
+summary(lm_year_MAPE_loc_fb)
+```

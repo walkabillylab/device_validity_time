@@ -17,17 +17,11 @@ library(tidyverse)
 ```
 
 ```
-## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-```
-
-```
-## ✔ ggplot2 3.4.0     ✔ purrr   0.3.4
-## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
-## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
-## ✔ readr   2.1.2     ✔ forcats 0.5.1
-```
-
-```
+## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+## ✔ readr   2.1.3      ✔ forcats 0.5.2 
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
@@ -35,26 +29,37 @@ library(tidyverse)
 
 ```r
 library(readxl)
+library(broom)
+library(broom.mixed)
 library(lme4)
 ```
 
 ```
 ## Loading required package: Matrix
-```
-
-```
 ## 
 ## Attaching package: 'Matrix'
-```
-
-```
+## 
 ## The following objects are masked from 'package:tidyr':
 ## 
 ##     expand, pack, unpack
 ```
 
 ```r
+library(rstatix)
+```
+
+```
+## 
+## Attaching package: 'rstatix'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+```
+
+```r
 library(gtsummary)
+library(knitr)
 ```
 
 ### Reading in data
@@ -222,20 +227,21 @@ There are multiple of device types within each brand that were tested for step c
 
 
 ```r
-table(clean_data$Brand, clean_data$device_year)
+brand_time <- table(clean_data$Brand, clean_data$device_year)
+kable(brand_time)
 ```
 
-```
-##           
-##            2008 2009 2011 2012 2013 2014 2015 2016
-##   Apple       0    0    0    0    0    0   30    1
-##   Fitbit     17    0   39  160  309   21   94   30
-##   Garmin      0    1    0    0    0  101   32   35
-##   Misfit      0    0    0   36    0    0    6    0
-##   Polar       0    0    6    0   27    1    7    1
-##   Samsung     0    0    0    0    0   11    3    1
-##   Withings    0    0    0    0   50   34    0    0
-```
+
+
+|         | 2008| 2009| 2011| 2012| 2013| 2014| 2015| 2016|
+|:--------|----:|----:|----:|----:|----:|----:|----:|----:|
+|Apple    |    0|    0|    0|    0|    0|    0|   30|    1|
+|Fitbit   |   17|    0|   39|  160|  309|   21|   94|   30|
+|Garmin   |    0|    1|    0|    0|    0|  101|   32|   35|
+|Misfit   |    0|    0|    0|   36|    0|    0|    6|    0|
+|Polar    |    0|    0|    6|    0|   27|    1|    7|    1|
+|Samsung  |    0|    0|    0|    0|    0|   11|    3|    1|
+|Withings |    0|    0|    0|    0|   50|   34|    0|    0|
 
 ```r
 histo_device_year_Brand <- ggplot(data = clean_data, aes(device_year)) +
@@ -255,7 +261,6 @@ plot(histo_device_year_Brand)
 
 ![](device_validity_time_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
-
 ### Summary of Mean Absolute Percentage Error for SC of all brands
 
 
@@ -269,8 +274,48 @@ summary(clean_data$MAPE)
 ```
 
 ```r
+mape_time <- clean_data %>%
+    group_by(Brand, device_year) %>%
+    get_summary_stats(MAPE, type = "mean_sd") %>%
+    arrange(Brand, device_year)
+kable(mape_time)
+```
+
+
+
+|Brand    | device_year|variable |   n|   mean|     sd|
+|:--------|-----------:|:--------|---:|------:|------:|
+|Apple    |        2015|MAPE     |  21|  1.678|  2.129|
+|Apple    |        2016|MAPE     |   1|  0.420|     NA|
+|Fitbit   |        2008|MAPE     |  17| 17.910| 27.046|
+|Fitbit   |        2011|MAPE     |  37|  1.958|  5.901|
+|Fitbit   |        2012|MAPE     | 145|  5.020| 11.668|
+|Fitbit   |        2013|MAPE     | 290| 15.816| 25.714|
+|Fitbit   |        2014|MAPE     |  20| 22.754| 29.263|
+|Fitbit   |        2015|MAPE     |  84|  3.378|  6.407|
+|Fitbit   |        2016|MAPE     |  25|  3.592|  9.753|
+|Fitbit   |          NA|MAPE     |   3| 11.197| 10.413|
+|Garmin   |        2009|MAPE     |   1|  0.041|     NA|
+|Garmin   |        2014|MAPE     |  97|  6.290| 16.190|
+|Garmin   |        2015|MAPE     |  19|  0.620|  1.317|
+|Garmin   |        2016|MAPE     |  32|  2.332|  5.639|
+|Misfit   |        2012|MAPE     |  35| 16.691| 23.339|
+|Misfit   |        2015|MAPE     |   6|  0.101|  0.053|
+|Polar    |        2011|MAPE     |   6| 15.594| 14.294|
+|Polar    |        2013|MAPE     |  27|  2.166|  4.085|
+|Polar    |        2014|MAPE     |   1| 22.959|     NA|
+|Polar    |        2015|MAPE     |   6|  3.490|  3.396|
+|Polar    |        2016|MAPE     |   1| 50.180|     NA|
+|Samsung  |        2014|MAPE     |  11|  2.412|  2.945|
+|Samsung  |        2015|MAPE     |   3|  2.783|  1.454|
+|Samsung  |        2016|MAPE     |   1|  0.210|     NA|
+|Withings |        2013|MAPE     |  47| 13.424| 29.523|
+|Withings |        2014|MAPE     |  29|  1.357|  3.047|
+
+```r
 histo_MAPE_SC <- ggplot(data = clean_data, aes(MAPE)) +
-        geom_histogram(bins = 45)
+        geom_histogram(bins = 45) + 
+        theme_bw()
 
 plot(histo_MAPE_SC)
 ```
@@ -290,8 +335,9 @@ The histogram indicates that the MAPE values are not normally distributed and th
 ```r
 scatter_MAPE_year_SC <- ggplot(data = clean_data, aes(x = device_year, y = MAPE)) +
       geom_point(alpha = 0.2) +
-      stat_smooth(method = "lm", colour = "red") + 
-      stat_smooth()
+      stat_smooth(method = "lm", colour = "gray") + 
+      stat_smooth() + 
+      theme_classic()
 
 plot(scatter_MAPE_year_SC)
 ```
@@ -333,8 +379,9 @@ As seen in the above scatter plot, as time (device year of release) increases, t
 ```r
 scatter_MAPE_year_Brand <- ggplot(data = clean_data, aes(x = device_year, y = MAPE)) +
       geom_point(alpha = 0.2) +
-      stat_smooth(method = "lm", colour = "red") +
-      facet_wrap(~ Brand)
+      stat_smooth(method = "lm", colour = "gray") +
+      facet_wrap(~ Brand) +
+      theme_bw()
 
 plot(scatter_MAPE_year_Brand)
 ```
@@ -391,12 +438,12 @@ tbl_regression(lm_year_MAPE)
 ```
 
 ```{=html}
-<div id="zvjskcpnde" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="iiizjlmkvy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zvjskcpnde .gt_table {
+#iiizjlmkvy .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -421,7 +468,7 @@ tbl_regression(lm_year_MAPE)
   border-left-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_heading {
+#iiizjlmkvy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -433,12 +480,12 @@ tbl_regression(lm_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_caption {
+#iiizjlmkvy .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#zvjskcpnde .gt_title {
+#iiizjlmkvy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -450,7 +497,7 @@ tbl_regression(lm_year_MAPE)
   border-bottom-width: 0;
 }
 
-#zvjskcpnde .gt_subtitle {
+#iiizjlmkvy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -462,13 +509,13 @@ tbl_regression(lm_year_MAPE)
   border-top-width: 0;
 }
 
-#zvjskcpnde .gt_bottom_border {
+#iiizjlmkvy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_col_headings {
+#iiizjlmkvy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -483,7 +530,7 @@ tbl_regression(lm_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_col_heading {
+#iiizjlmkvy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -503,7 +550,7 @@ tbl_regression(lm_year_MAPE)
   overflow-x: hidden;
 }
 
-#zvjskcpnde .gt_column_spanner_outer {
+#iiizjlmkvy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -515,15 +562,15 @@ tbl_regression(lm_year_MAPE)
   padding-right: 4px;
 }
 
-#zvjskcpnde .gt_column_spanner_outer:first-child {
+#iiizjlmkvy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zvjskcpnde .gt_column_spanner_outer:last-child {
+#iiizjlmkvy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zvjskcpnde .gt_column_spanner {
+#iiizjlmkvy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -535,7 +582,7 @@ tbl_regression(lm_year_MAPE)
   width: 100%;
 }
 
-#zvjskcpnde .gt_group_heading {
+#iiizjlmkvy .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -561,7 +608,7 @@ tbl_regression(lm_year_MAPE)
   text-align: left;
 }
 
-#zvjskcpnde .gt_empty_group_heading {
+#iiizjlmkvy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -576,15 +623,15 @@ tbl_regression(lm_year_MAPE)
   vertical-align: middle;
 }
 
-#zvjskcpnde .gt_from_md > :first-child {
+#iiizjlmkvy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zvjskcpnde .gt_from_md > :last-child {
+#iiizjlmkvy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zvjskcpnde .gt_row {
+#iiizjlmkvy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -603,7 +650,7 @@ tbl_regression(lm_year_MAPE)
   overflow-x: hidden;
 }
 
-#zvjskcpnde .gt_stub {
+#iiizjlmkvy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -616,7 +663,7 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#zvjskcpnde .gt_stub_row_group {
+#iiizjlmkvy .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -630,11 +677,11 @@ tbl_regression(lm_year_MAPE)
   vertical-align: top;
 }
 
-#zvjskcpnde .gt_row_group_first td {
+#iiizjlmkvy .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#zvjskcpnde .gt_summary_row {
+#iiizjlmkvy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -644,16 +691,16 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#zvjskcpnde .gt_first_summary_row {
+#iiizjlmkvy .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_first_summary_row.thick {
+#iiizjlmkvy .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#zvjskcpnde .gt_last_summary_row {
+#iiizjlmkvy .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -663,7 +710,7 @@ tbl_regression(lm_year_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_grand_summary_row {
+#iiizjlmkvy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -673,7 +720,7 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#zvjskcpnde .gt_first_grand_summary_row {
+#iiizjlmkvy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -683,11 +730,11 @@ tbl_regression(lm_year_MAPE)
   border-top-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_striped {
+#iiizjlmkvy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zvjskcpnde .gt_table_body {
+#iiizjlmkvy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -696,7 +743,7 @@ tbl_regression(lm_year_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_footnotes {
+#iiizjlmkvy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -710,7 +757,7 @@ tbl_regression(lm_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_footnote {
+#iiizjlmkvy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -719,7 +766,7 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#zvjskcpnde .gt_sourcenotes {
+#iiizjlmkvy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -733,7 +780,7 @@ tbl_regression(lm_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#zvjskcpnde .gt_sourcenote {
+#iiizjlmkvy .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -741,64 +788,64 @@ tbl_regression(lm_year_MAPE)
   padding-right: 5px;
 }
 
-#zvjskcpnde .gt_left {
+#iiizjlmkvy .gt_left {
   text-align: left;
 }
 
-#zvjskcpnde .gt_center {
+#iiizjlmkvy .gt_center {
   text-align: center;
 }
 
-#zvjskcpnde .gt_right {
+#iiizjlmkvy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zvjskcpnde .gt_font_normal {
+#iiizjlmkvy .gt_font_normal {
   font-weight: normal;
 }
 
-#zvjskcpnde .gt_font_bold {
+#iiizjlmkvy .gt_font_bold {
   font-weight: bold;
 }
 
-#zvjskcpnde .gt_font_italic {
+#iiizjlmkvy .gt_font_italic {
   font-style: italic;
 }
 
-#zvjskcpnde .gt_super {
+#iiizjlmkvy .gt_super {
   font-size: 65%;
 }
 
-#zvjskcpnde .gt_footnote_marks {
+#iiizjlmkvy .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#zvjskcpnde .gt_asterisk {
+#iiizjlmkvy .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#zvjskcpnde .gt_indent_1 {
+#iiizjlmkvy .gt_indent_1 {
   text-indent: 5px;
 }
 
-#zvjskcpnde .gt_indent_2 {
+#iiizjlmkvy .gt_indent_2 {
   text-indent: 10px;
 }
 
-#zvjskcpnde .gt_indent_3 {
+#iiizjlmkvy .gt_indent_3 {
   text-indent: 15px;
 }
 
-#zvjskcpnde .gt_indent_4 {
+#iiizjlmkvy .gt_indent_4 {
   text-indent: 20px;
 }
 
-#zvjskcpnde .gt_indent_5 {
+#iiizjlmkvy .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -856,7 +903,7 @@ summary(lmer_year_MAPE)
 ## 
 ## Fixed effects:
 ##               Estimate Std. Error t value
-## (Intercept)  173.97539 1237.90022   0.141
+## (Intercept)  173.97546 1237.90021   0.141
 ## device_year   -0.08193    0.61490  -0.133
 ## 
 ## Correlation of Fixed Effects:
@@ -869,12 +916,12 @@ tbl_regression(lmer_year_MAPE)
 ```
 
 ```{=html}
-<div id="ilzaztwckg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="rdjvslcndl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ilzaztwckg .gt_table {
+#rdjvslcndl .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -899,7 +946,7 @@ tbl_regression(lmer_year_MAPE)
   border-left-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_heading {
+#rdjvslcndl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -911,12 +958,12 @@ tbl_regression(lmer_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_caption {
+#rdjvslcndl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ilzaztwckg .gt_title {
+#rdjvslcndl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -928,7 +975,7 @@ tbl_regression(lmer_year_MAPE)
   border-bottom-width: 0;
 }
 
-#ilzaztwckg .gt_subtitle {
+#rdjvslcndl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -940,13 +987,13 @@ tbl_regression(lmer_year_MAPE)
   border-top-width: 0;
 }
 
-#ilzaztwckg .gt_bottom_border {
+#rdjvslcndl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_col_headings {
+#rdjvslcndl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -961,7 +1008,7 @@ tbl_regression(lmer_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_col_heading {
+#rdjvslcndl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -981,7 +1028,7 @@ tbl_regression(lmer_year_MAPE)
   overflow-x: hidden;
 }
 
-#ilzaztwckg .gt_column_spanner_outer {
+#rdjvslcndl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -993,15 +1040,15 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 4px;
 }
 
-#ilzaztwckg .gt_column_spanner_outer:first-child {
+#rdjvslcndl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ilzaztwckg .gt_column_spanner_outer:last-child {
+#rdjvslcndl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ilzaztwckg .gt_column_spanner {
+#rdjvslcndl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1013,7 +1060,7 @@ tbl_regression(lmer_year_MAPE)
   width: 100%;
 }
 
-#ilzaztwckg .gt_group_heading {
+#rdjvslcndl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1039,7 +1086,7 @@ tbl_regression(lmer_year_MAPE)
   text-align: left;
 }
 
-#ilzaztwckg .gt_empty_group_heading {
+#rdjvslcndl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1054,15 +1101,15 @@ tbl_regression(lmer_year_MAPE)
   vertical-align: middle;
 }
 
-#ilzaztwckg .gt_from_md > :first-child {
+#rdjvslcndl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ilzaztwckg .gt_from_md > :last-child {
+#rdjvslcndl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ilzaztwckg .gt_row {
+#rdjvslcndl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1081,7 +1128,7 @@ tbl_regression(lmer_year_MAPE)
   overflow-x: hidden;
 }
 
-#ilzaztwckg .gt_stub {
+#rdjvslcndl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1094,7 +1141,7 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#ilzaztwckg .gt_stub_row_group {
+#rdjvslcndl .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1108,11 +1155,11 @@ tbl_regression(lmer_year_MAPE)
   vertical-align: top;
 }
 
-#ilzaztwckg .gt_row_group_first td {
+#rdjvslcndl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ilzaztwckg .gt_summary_row {
+#rdjvslcndl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1122,16 +1169,16 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#ilzaztwckg .gt_first_summary_row {
+#rdjvslcndl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_first_summary_row.thick {
+#rdjvslcndl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ilzaztwckg .gt_last_summary_row {
+#rdjvslcndl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1141,7 +1188,7 @@ tbl_regression(lmer_year_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_grand_summary_row {
+#rdjvslcndl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1151,7 +1198,7 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#ilzaztwckg .gt_first_grand_summary_row {
+#rdjvslcndl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1161,11 +1208,11 @@ tbl_regression(lmer_year_MAPE)
   border-top-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_striped {
+#rdjvslcndl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ilzaztwckg .gt_table_body {
+#rdjvslcndl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1174,7 +1221,7 @@ tbl_regression(lmer_year_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_footnotes {
+#rdjvslcndl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1188,7 +1235,7 @@ tbl_regression(lmer_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_footnote {
+#rdjvslcndl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1197,7 +1244,7 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#ilzaztwckg .gt_sourcenotes {
+#rdjvslcndl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1211,7 +1258,7 @@ tbl_regression(lmer_year_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#ilzaztwckg .gt_sourcenote {
+#rdjvslcndl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1219,64 +1266,64 @@ tbl_regression(lmer_year_MAPE)
   padding-right: 5px;
 }
 
-#ilzaztwckg .gt_left {
+#rdjvslcndl .gt_left {
   text-align: left;
 }
 
-#ilzaztwckg .gt_center {
+#rdjvslcndl .gt_center {
   text-align: center;
 }
 
-#ilzaztwckg .gt_right {
+#rdjvslcndl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ilzaztwckg .gt_font_normal {
+#rdjvslcndl .gt_font_normal {
   font-weight: normal;
 }
 
-#ilzaztwckg .gt_font_bold {
+#rdjvslcndl .gt_font_bold {
   font-weight: bold;
 }
 
-#ilzaztwckg .gt_font_italic {
+#rdjvslcndl .gt_font_italic {
   font-style: italic;
 }
 
-#ilzaztwckg .gt_super {
+#rdjvslcndl .gt_super {
   font-size: 65%;
 }
 
-#ilzaztwckg .gt_footnote_marks {
+#rdjvslcndl .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#ilzaztwckg .gt_asterisk {
+#rdjvslcndl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ilzaztwckg .gt_indent_1 {
+#rdjvslcndl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ilzaztwckg .gt_indent_2 {
+#rdjvslcndl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ilzaztwckg .gt_indent_3 {
+#rdjvslcndl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ilzaztwckg .gt_indent_4 {
+#rdjvslcndl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ilzaztwckg .gt_indent_5 {
+#rdjvslcndl .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1383,7 +1430,7 @@ summary(lmer_year_by_brand_MAPE)
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -2.8694 -0.2380 -0.0851  0.0301  5.2897 
+## -2.8694 -0.2380 -0.0851  0.0301  5.2898 
 ## 
 ## Random effects:
 ##  Groups     Name        Variance Std.Dev.
@@ -1393,20 +1440,20 @@ summary(lmer_year_by_brand_MAPE)
 ## 
 ## Fixed effects:
 ##                             Estimate Std. Error t value
-## (Intercept)                6142.7699 35807.9215   0.172
-## device_year                  -3.0450    17.7702  -0.171
-## BrandFitbit               -6707.5061 35844.8048  -0.187
-## BrandGarmin               -6980.5844 35976.2385  -0.194
-## BrandMisfit               -5322.8304 36321.4983  -0.147
-## BrandPolar                -9757.6599 36307.5482  -0.269
-## BrandSamsung              -1085.1810 36220.8861  -0.030
-## BrandWithings             -1125.8147 37000.7443  -0.030
-## device_year:BrandFitbit       3.3302    17.7886   0.187
-## device_year:BrandGarmin       3.4646    17.8538   0.194
-## device_year:BrandMisfit       2.6422    18.0256   0.147
-## device_year:BrandPolar        4.8461    18.0186   0.269
-## device_year:BrandSamsung      0.5385    17.9757   0.030
-## device_year:BrandWithings     0.5584    18.3631   0.030
+## (Intercept)                6142.2900 35808.2152   0.172
+## device_year                  -3.0448    17.7704  -0.171
+## BrandFitbit               -6707.4177 35845.0989  -0.187
+## BrandGarmin               -6980.4793 35976.5346  -0.194
+## BrandMisfit               -5322.8555 36321.7900  -0.147
+## BrandPolar                -9757.6078 36307.8766  -0.269
+## BrandSamsung              -1084.9111 36220.7141  -0.030
+## BrandWithings             -1126.5861 37001.0255  -0.030
+## device_year:BrandFitbit       3.3301    17.7887   0.187
+## device_year:BrandGarmin       3.4646    17.8540   0.194
+## device_year:BrandMisfit       2.6422    18.0258   0.147
+## device_year:BrandPolar        4.8461    18.0188   0.269
+## device_year:BrandSamsung      0.5383    17.9756   0.030
+## device_year:BrandWithings     0.5588    18.3633   0.030
 ```
 
 ```
@@ -1421,12 +1468,12 @@ tbl_regression(lmer_year_by_brand_MAPE)
 ```
 
 ```{=html}
-<div id="oezbvmcenz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="kficwduvdw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#oezbvmcenz .gt_table {
+#kficwduvdw .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1451,7 +1498,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-left-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_heading {
+#kficwduvdw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1463,12 +1510,12 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_caption {
+#kficwduvdw .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#oezbvmcenz .gt_title {
+#kficwduvdw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1480,7 +1527,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-bottom-width: 0;
 }
 
-#oezbvmcenz .gt_subtitle {
+#kficwduvdw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1492,13 +1539,13 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-top-width: 0;
 }
 
-#oezbvmcenz .gt_bottom_border {
+#kficwduvdw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_col_headings {
+#kficwduvdw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1513,7 +1560,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_col_heading {
+#kficwduvdw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1533,7 +1580,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   overflow-x: hidden;
 }
 
-#oezbvmcenz .gt_column_spanner_outer {
+#kficwduvdw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1545,15 +1592,15 @@ tbl_regression(lmer_year_by_brand_MAPE)
   padding-right: 4px;
 }
 
-#oezbvmcenz .gt_column_spanner_outer:first-child {
+#kficwduvdw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#oezbvmcenz .gt_column_spanner_outer:last-child {
+#kficwduvdw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#oezbvmcenz .gt_column_spanner {
+#kficwduvdw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1565,7 +1612,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   width: 100%;
 }
 
-#oezbvmcenz .gt_group_heading {
+#kficwduvdw .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1591,7 +1638,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   text-align: left;
 }
 
-#oezbvmcenz .gt_empty_group_heading {
+#kficwduvdw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1606,15 +1653,15 @@ tbl_regression(lmer_year_by_brand_MAPE)
   vertical-align: middle;
 }
 
-#oezbvmcenz .gt_from_md > :first-child {
+#kficwduvdw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#oezbvmcenz .gt_from_md > :last-child {
+#kficwduvdw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#oezbvmcenz .gt_row {
+#kficwduvdw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1633,7 +1680,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   overflow-x: hidden;
 }
 
-#oezbvmcenz .gt_stub {
+#kficwduvdw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1646,7 +1693,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   padding-right: 5px;
 }
 
-#oezbvmcenz .gt_stub_row_group {
+#kficwduvdw .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1660,11 +1707,11 @@ tbl_regression(lmer_year_by_brand_MAPE)
   vertical-align: top;
 }
 
-#oezbvmcenz .gt_row_group_first td {
+#kficwduvdw .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#oezbvmcenz .gt_summary_row {
+#kficwduvdw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1674,16 +1721,16 @@ tbl_regression(lmer_year_by_brand_MAPE)
   padding-right: 5px;
 }
 
-#oezbvmcenz .gt_first_summary_row {
+#kficwduvdw .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_first_summary_row.thick {
+#kficwduvdw .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#oezbvmcenz .gt_last_summary_row {
+#kficwduvdw .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1693,7 +1740,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_grand_summary_row {
+#kficwduvdw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1703,7 +1750,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   padding-right: 5px;
 }
 
-#oezbvmcenz .gt_first_grand_summary_row {
+#kficwduvdw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1713,11 +1760,11 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-top-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_striped {
+#kficwduvdw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#oezbvmcenz .gt_table_body {
+#kficwduvdw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1726,7 +1773,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-bottom-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_footnotes {
+#kficwduvdw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1740,7 +1787,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_footnote {
+#kficwduvdw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1749,7 +1796,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   padding-right: 5px;
 }
 
-#oezbvmcenz .gt_sourcenotes {
+#kficwduvdw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1763,7 +1810,7 @@ tbl_regression(lmer_year_by_brand_MAPE)
   border-right-color: #D3D3D3;
 }
 
-#oezbvmcenz .gt_sourcenote {
+#kficwduvdw .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1771,64 +1818,64 @@ tbl_regression(lmer_year_by_brand_MAPE)
   padding-right: 5px;
 }
 
-#oezbvmcenz .gt_left {
+#kficwduvdw .gt_left {
   text-align: left;
 }
 
-#oezbvmcenz .gt_center {
+#kficwduvdw .gt_center {
   text-align: center;
 }
 
-#oezbvmcenz .gt_right {
+#kficwduvdw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#oezbvmcenz .gt_font_normal {
+#kficwduvdw .gt_font_normal {
   font-weight: normal;
 }
 
-#oezbvmcenz .gt_font_bold {
+#kficwduvdw .gt_font_bold {
   font-weight: bold;
 }
 
-#oezbvmcenz .gt_font_italic {
+#kficwduvdw .gt_font_italic {
   font-style: italic;
 }
 
-#oezbvmcenz .gt_super {
+#kficwduvdw .gt_super {
   font-size: 65%;
 }
 
-#oezbvmcenz .gt_footnote_marks {
+#kficwduvdw .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#oezbvmcenz .gt_asterisk {
+#kficwduvdw .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#oezbvmcenz .gt_indent_1 {
+#kficwduvdw .gt_indent_1 {
   text-indent: 5px;
 }
 
-#oezbvmcenz .gt_indent_2 {
+#kficwduvdw .gt_indent_2 {
   text-indent: 10px;
 }
 
-#oezbvmcenz .gt_indent_3 {
+#kficwduvdw .gt_indent_3 {
   text-indent: 15px;
 }
 
-#oezbvmcenz .gt_indent_4 {
+#kficwduvdw .gt_indent_4 {
   text-indent: 20px;
 }
 
-#oezbvmcenz .gt_indent_5 {
+#kficwduvdw .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1852,23 +1899,23 @@ tbl_regression(lmer_year_by_brand_MAPE)
 <td headers="estimate" class="gt_row gt_center">—</td>
 <td headers="ci" class="gt_row gt_center">—</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Fitbit</td>
-<td headers="estimate" class="gt_row gt_center">-6,708</td>
-<td headers="ci" class="gt_row gt_center">-76,962, 63,547</td></tr>
+<td headers="estimate" class="gt_row gt_center">-6,707</td>
+<td headers="ci" class="gt_row gt_center">-76,963, 63,548</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Garmin</td>
-<td headers="estimate" class="gt_row gt_center">-6,981</td>
+<td headers="estimate" class="gt_row gt_center">-6,980</td>
 <td headers="ci" class="gt_row gt_center">-77,493, 63,532</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Misfit</td>
 <td headers="estimate" class="gt_row gt_center">-5,323</td>
-<td headers="ci" class="gt_row gt_center">-76,512, 65,866</td></tr>
+<td headers="ci" class="gt_row gt_center">-76,512, 65,867</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Polar</td>
 <td headers="estimate" class="gt_row gt_center">-9,758</td>
-<td headers="ci" class="gt_row gt_center">-80,919, 61,404</td></tr>
+<td headers="ci" class="gt_row gt_center">-80,920, 61,405</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Samsung</td>
 <td headers="estimate" class="gt_row gt_center">-1,085</td>
-<td headers="ci" class="gt_row gt_center">-72,077, 69,906</td></tr>
+<td headers="ci" class="gt_row gt_center">-72,076, 69,906</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Withings</td>
-<td headers="estimate" class="gt_row gt_center">-1,126</td>
-<td headers="ci" class="gt_row gt_center">-73,646, 71,394</td></tr>
+<td headers="estimate" class="gt_row gt_center">-1,127</td>
+<td headers="ci" class="gt_row gt_center">-73,647, 71,394</td></tr>
     <tr><td headers="label" class="gt_row gt_left">device_year * Brand</td>
 <td headers="estimate" class="gt_row gt_center"></td>
 <td headers="ci" class="gt_row gt_center"></td></tr>
