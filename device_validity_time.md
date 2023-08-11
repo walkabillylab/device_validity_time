@@ -143,19 +143,32 @@ glimpse(validity)
 ## $ MAPE               <dbl> 0.0276, 0.0163, 0.0114, 0.0121, 0.0144, 0.0299, 0.0…
 ```
 
+### Filtering the data for SC
+
+
+```r
+validity <- subset(validity, Measured != "EE" & Measured != "HR")
+```
 
 ### Removing Xiaomi and Mio (only one year of devices)
 
 
 ```r
-validity <- subset(validity, Brand != "Mio" & Brand != "Xiaomi")
+validity <- subset(validity, Brand != "Xiaomi")
+
+validity <- subset(validity, Brand != "Mio")
 ```
 
-### Filtering the data for SC
+### Removing years prior to 2011
 
 
 ```r
-clean_data <- subset(validity, Measured != "EE" & Measured != "HR")
+validity <- subset(validity, device_year != "2008" & device_year != "2009")
+```
+
+
+```r
+clean_data <- validity %>% drop_na(MAPE)
 
 ### Create study_year variable
 
@@ -164,7 +177,7 @@ length(clean_data$study_year)
 ```
 
 ```
-## [1] 1056
+## [1] 944
 ```
 
 
@@ -178,7 +191,7 @@ table(clean_data$Brand)
 ```
 ## 
 ##    Apple   Fitbit   Garmin   Misfit    Polar  Samsung Withings 
-##       31      673      169       42       42       15       84
+##       22      601      148       41       41       15       76
 ```
 
 There are 7 different brands of commercial wearable devices included in this study. They are: Apple (31 validity tests), Fitbit (673 validity tests), Garmin (169 validity tests), Misfit (42 validity tests), Polar (42 validity tests), Samsung (15 validity tests) and Withings (84 validity tests).
@@ -192,32 +205,30 @@ table(clean_data$device_name)
 
 ```
 ## 
-##             Apple Watch    Apple Watch Series 2                  Fitbit 
-##                      30                       1                       3 
-##           Fitbit Charge         Fitbit Charge 2        Fitbit Charge HR 
-##                      21                      30                      76 
-##          Fitbit Classic             Fitbit Flex            Fitbit Force 
-##                      17                     109                       6 
-##              Fitbit One            Fitbit Surge            Fitbit Ultra 
-##                     160                      18                      39 
-##              Fitbit Zip   Garmin Forerunner 235 Garmin Forerunner 405CX 
-##                     194                       2                       1 
+##             Apple Watch    Apple Watch Series 2           Fitbit Charge 
+##                      21                       1                      20 
+##         Fitbit Charge 2        Fitbit Charge HR             Fitbit Flex 
+##                      25                      66                      98 
+##            Fitbit Force              Fitbit One            Fitbit Surge 
+##                       5                     145                      18 
+##            Fitbit Ultra              Fitbit Zip   Garmin Forerunner 235 
+##                      37                     187                       2 
 ## Garmin Forerunner 735XT Garmin Forerunner 920XT       Garmin Vivoactive 
 ##                       3                       6                       6 
 ##          Garmin Vivofit        Garmin Vivofit 2        Garmin Vivofit 3 
-##                      81                      11                       6 
+##                      77                       3                       6 
 ##        Garmin Vivosmart     Garmin Vivosmart HR    Garmin Vivosmart HR+ 
-##                      14                      13                      26 
-##            Misfit Flash            Misfit Shine              Polar A300 
-##                       6                      36                       1 
-##              Polar A360            Polar Active              Polar Loop 
-##                       6                       6                      27 
-##              Polar M600              Polar V800          Samsung Gear 2 
-##                       1                       1                       4 
-##          Samsung Gear S         Samsung Gear S2         Samsung Gear S3 
-##                       7                       3                       1 
-##       Withings Pulse O2       Withings Pulse Ox 
-##                      50                      34
+##                      14                       8                      23 
+##            Misfit Flash            Misfit Shine              Polar A360 
+##                       6                      35                       6 
+##            Polar Active              Polar Loop              Polar M600 
+##                       6                      27                       1 
+##              Polar V800          Samsung Gear 2          Samsung Gear S 
+##                       1                       4                       7 
+##         Samsung Gear S2         Samsung Gear S3       Withings Pulse O2 
+##                       3                       1                      47 
+##       Withings Pulse Ox 
+##                      29
 ```
 
 There are multiple of device types within each brand that were tested for step count validity. Apple has two device types tested: Apple Watch (30 validity tests) and Apple Watch Series 2 (1 validity test). Fitbit has 11 device types: Fitbit (3), Fitbit Charge (21), Fitbit Charge 2 (30), Fitbit Charge HR (76), Fitbit Classic (17), Fitbit Flex (109), Fitbit Force (6), Fitbit One (160), Fitbit Surge (18), Fitbit Ultra (39), Fitbit Zip (194). Garmin has 11 device types: Garmin Forerunner 235 (2), Garmin Forerunner 405CX (1), Garmin Forerunner 735XT (3), Garmin Forerunner 920XT (6), Garmin Vivoactive (6), Garmin Vivofit (81), Garmin Vivofit 2 (11), Garmin Vivofit 3 (6), Garmin Vivosmart (14), Garmin Vivosmart HR (13) and Garmin Vivosmart HR+ (26). Misfit has two device types: Misfit Flash (6) and Misfit Shine (36). Polar has 6 device types: Polar A300 (1), Polar A360 (6), Polar Active (6), Polar Loop (27), Polar M600 (1) and Polar V800 (1). Samsung has 4 device types: Samsung Gear 2 (4), Samsung Gear S (7), Samsung Gear S2 (3) and Samsung Gear S3 (1). Withings has 2 device types: Withings Pulse O2 (50) and Withings Pulse Ox (34).
@@ -233,15 +244,15 @@ kable(brand_time)
 
 
 
-|         | 2008| 2009| 2011| 2012| 2013| 2014| 2015| 2016|
-|:--------|----:|----:|----:|----:|----:|----:|----:|----:|
-|Apple    |    0|    0|    0|    0|    0|    0|   30|    1|
-|Fitbit   |   17|    0|   39|  160|  309|   21|   94|   30|
-|Garmin   |    0|    1|    0|    0|    0|  101|   32|   35|
-|Misfit   |    0|    0|    0|   36|    0|    0|    6|    0|
-|Polar    |    0|    0|    6|    0|   27|    1|    7|    1|
-|Samsung  |    0|    0|    0|    0|    0|   11|    3|    1|
-|Withings |    0|    0|    0|    0|   50|   34|    0|    0|
+|         | 2011| 2012| 2013| 2014| 2015| 2016|
+|:--------|----:|----:|----:|----:|----:|----:|
+|Apple    |    0|    0|    0|    0|   21|    1|
+|Fitbit   |   37|  145|  290|   20|   84|   25|
+|Garmin   |    0|    0|    0|   97|   19|   32|
+|Misfit   |    0|   35|    0|    0|    6|    0|
+|Polar    |    6|    0|   27|    1|    6|    1|
+|Samsung  |    0|    0|    0|   11|    3|    1|
+|Withings |    0|    0|   47|   29|    0|    0|
 
 ```r
 histo_device_year_Brand <- ggplot(data = clean_data, aes(device_year)) +
@@ -255,11 +266,7 @@ plot(histo_device_year_Brand)
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
-```
-## Warning: Removed 3 rows containing non-finite values (`stat_bin()`).
-```
-
-![](device_validity_time_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](device_validity_time_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 ### Summary of Mean Absolute Percentage Error for SC of all brands
 
@@ -269,16 +276,35 @@ summary(clean_data$MAPE)
 ```
 
 ```
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-##   0.000   0.069   0.600   9.142   6.900 100.000      91
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+##   0.00000   0.06628   0.57450   8.98760   6.50774 100.00000
 ```
 
 ```r
 mape_time <- clean_data %>%
+    group_by(device_year) %>%
+    get_summary_stats(MAPE, type = "mean_sd") %>%
+    arrange(device_year)
+kable(mape_time)
+```
+
+
+
+| device_year|variable |   n|   mean|     sd|
+|-----------:|:--------|---:|------:|------:|
+|        2011|MAPE     |  43|  3.861|  8.776|
+|        2012|MAPE     | 180|  7.290| 15.312|
+|        2013|MAPE     | 364| 14.495| 25.513|
+|        2014|MAPE     | 158|  7.304| 17.519|
+|        2015|MAPE     | 139|  2.595|  5.231|
+|        2016|MAPE     |  60|  3.587|  9.665|
+
+```r
+mape_time_brand <- clean_data %>%
     group_by(Brand, device_year) %>%
     get_summary_stats(MAPE, type = "mean_sd") %>%
     arrange(Brand, device_year)
-kable(mape_time)
+kable(mape_time_brand)
 ```
 
 
@@ -287,15 +313,12 @@ kable(mape_time)
 |:--------|-----------:|:--------|---:|------:|------:|
 |Apple    |        2015|MAPE     |  21|  1.678|  2.129|
 |Apple    |        2016|MAPE     |   1|  0.420|     NA|
-|Fitbit   |        2008|MAPE     |  17| 17.910| 27.046|
 |Fitbit   |        2011|MAPE     |  37|  1.958|  5.901|
 |Fitbit   |        2012|MAPE     | 145|  5.020| 11.668|
 |Fitbit   |        2013|MAPE     | 290| 15.816| 25.714|
 |Fitbit   |        2014|MAPE     |  20| 22.754| 29.263|
 |Fitbit   |        2015|MAPE     |  84|  3.378|  6.407|
 |Fitbit   |        2016|MAPE     |  25|  3.592|  9.753|
-|Fitbit   |          NA|MAPE     |   3| 11.197| 10.413|
-|Garmin   |        2009|MAPE     |   1|  0.041|     NA|
 |Garmin   |        2014|MAPE     |  97|  6.290| 16.190|
 |Garmin   |        2015|MAPE     |  19|  0.620|  1.317|
 |Garmin   |        2016|MAPE     |  32|  2.332|  5.639|
@@ -320,11 +343,7 @@ histo_MAPE_SC <- ggplot(data = clean_data, aes(MAPE)) +
 plot(histo_MAPE_SC)
 ```
 
-```
-## Warning: Removed 91 rows containing non-finite values (`stat_bin()`).
-```
-
-![](device_validity_time_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](device_validity_time_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 The histogram indicates that the MAPE values are not normally distributed and that there is an extreme positive skewness. Majority of the MAPE values lie to the left of the distribution. The mean is likely not be a good measure of central tendency for this data because of the degree of skewness seen in the histogram. Therefore, we will want to use the median value instead.
 
@@ -344,31 +363,10 @@ plot(scatter_MAPE_year_SC)
 
 ```
 ## `geom_smooth()` using formula = 'y ~ x'
+## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 ```
 
-```
-## Warning: Removed 94 rows containing non-finite values (`stat_smooth()`).
-```
-
-```
-## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
-```
-
-```
-## Warning: Removed 94 rows containing non-finite values (`stat_smooth()`).
-```
-
-```
-## Warning: Computation failed in `stat_smooth()`
-## Caused by error in `smooth.construct.cr.smooth.spec()`:
-## ! x has insufficient unique values to support 10 knots: reduce k.
-```
-
-```
-## Warning: Removed 94 rows containing missing values (`geom_point()`).
-```
-
-![](device_validity_time_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](device_validity_time_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 As seen in the above scatter plot, as time (device year of release) increases, the Mean Absolute Percentage Error of Step Count measurement increases. MAPE is representative of accuracy, therefore the accuracy for these commercial wearable devices to measure step count decreases over time. 
 
@@ -390,23 +388,45 @@ plot(scatter_MAPE_year_Brand)
 ## `geom_smooth()` using formula = 'y ~ x'
 ```
 
-```
-## Warning: Removed 94 rows containing non-finite values (`stat_smooth()`).
+![](device_validity_time_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
+```r
+ggsave("scatter_MAPE_year_Brand.pdf", scatter_MAPE_year_Brand, dpi = 300)
 ```
 
 ```
-## Warning: Removed 94 rows containing missing values (`geom_point()`).
+## Saving 7 x 5 in image
+## `geom_smooth()` using formula = 'y ~ x'
 ```
-
-![](device_validity_time_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 As seen in the above figure, the accuracy of wearable devices to measure step count varies by brand. Of the validity tests conducted using Apple devices, there was a decrease in MAPE values between devices released in 2015 and 2016. This indicates that the accuracy of Apple devices increased with the release of a newer version of wearable technology. When analyzing the data for the brand Fitbit, it can be seen that there was an increased in MAPE values between devices released from 2011-2016. This indicates that the accuracy of Fitbit devices decreased with the release of newer versions of wearable technology. A similar trend was seen in Garmin devices released between the years of 2009-2016. The step count accuracy of these devices decreased as well. The brands Misfit and Polar show increases in accuracy in devices released from 2012-2015 and 2013-2015, respectively. Samsung and Withings show decreases in accuracy in devices released from 2014-2016 ans 2013-2014, respectively. 
 
-## Linear Regression: Device year as a predictor of Step Count MAPE
+## Recoding device year as continuous 
 
 
 ```r
-lm_year_MAPE <- lm(MAPE ~ device_year, data = clean_data)
+clean_data <- clean_data %>%
+	mutate(device_year_c = case_when(
+		device_year == 2011 ~ 1,
+		device_year == 2012 ~ 2,
+		device_year == 2013 ~ 3,
+		device_year == 2014 ~ 4,
+		device_year == 2015 ~ 5,
+		device_year == 2016 ~ 6,
+	))
+summary(clean_data$device_year_c)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   1.000   3.000   3.000   3.371   4.000   6.000
+```
+
+## Model 1: Linear Regression Device year as a predictor of Step Count MAPE
+
+
+```r
+lm_year_MAPE <- lm(MAPE ~ device_year_c, data = clean_data)
 
 summary(lm_year_MAPE)
 ```
@@ -414,955 +434,43 @@ summary(lm_year_MAPE)
 ```
 ## 
 ## Call:
-## lm(formula = MAPE ~ device_year, data = clean_data)
+## lm(formula = MAPE ~ device_year_c, data = clean_data)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -16.889  -9.488  -6.472  -2.376  90.448 
+## -12.631  -9.482  -6.465  -2.363  90.443 
 ## 
 ## Coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) 3096.0530   886.6980   3.492 0.000502 ***
-## device_year   -1.5333     0.4404  -3.481 0.000521 ***
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)     14.168      1.819   7.788 1.79e-14 ***
+## device_year_c   -1.537      0.506  -3.037  0.00245 ** 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 19.58 on 960 degrees of freedom
-##   (94 observations deleted due to missingness)
-## Multiple R-squared:  0.01247,	Adjusted R-squared:  0.01144 
-## F-statistic: 12.12 on 1 and 960 DF,  p-value: 0.0005213
+## Residual standard error: 19.44 on 942 degrees of freedom
+## Multiple R-squared:  0.009698,	Adjusted R-squared:  0.008647 
+## F-statistic: 9.225 on 1 and 942 DF,  p-value: 0.002453
 ```
 
 ```r
-tbl_regression(lm_year_MAPE)
-```
-
-```{=html}
-<div id="iiizjlmkvy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#iiizjlmkvy .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #333333;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  background-color: #FFFFFF;
-  width: auto;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_caption {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#iiizjlmkvy .gt_title {
-  color: #333333;
-  font-size: 125%;
-  font-weight: initial;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#iiizjlmkvy .gt_subtitle {
-  color: #333333;
-  font-size: 85%;
-  font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#iiizjlmkvy .gt_bottom_border {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_col_headings {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_col_heading {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow-x: hidden;
-}
-
-#iiizjlmkvy .gt_column_spanner_outer {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-#iiizjlmkvy .gt_column_spanner_outer:first-child {
-  padding-left: 0;
-}
-
-#iiizjlmkvy .gt_column_spanner_outer:last-child {
-  padding-right: 0;
-}
-
-#iiizjlmkvy .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow-x: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-#iiizjlmkvy .gt_group_heading {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  text-align: left;
-}
-
-#iiizjlmkvy .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#iiizjlmkvy .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#iiizjlmkvy .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#iiizjlmkvy .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin: 10px;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  overflow-x: hidden;
-}
-
-#iiizjlmkvy .gt_stub {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#iiizjlmkvy .gt_stub_row_group {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-  vertical-align: top;
-}
-
-#iiizjlmkvy .gt_row_group_first td {
-  border-top-width: 2px;
-}
-
-#iiizjlmkvy .gt_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#iiizjlmkvy .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_first_summary_row.thick {
-  border-top-width: 2px;
-}
-
-#iiizjlmkvy .gt_last_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_grand_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#iiizjlmkvy .gt_first_grand_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
-#iiizjlmkvy .gt_table_body {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_footnotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_footnote {
-  margin: 0px;
-  font-size: 90%;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#iiizjlmkvy .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#iiizjlmkvy .gt_sourcenote {
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#iiizjlmkvy .gt_left {
-  text-align: left;
-}
-
-#iiizjlmkvy .gt_center {
-  text-align: center;
-}
-
-#iiizjlmkvy .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#iiizjlmkvy .gt_font_normal {
-  font-weight: normal;
-}
-
-#iiizjlmkvy .gt_font_bold {
-  font-weight: bold;
-}
-
-#iiizjlmkvy .gt_font_italic {
-  font-style: italic;
-}
-
-#iiizjlmkvy .gt_super {
-  font-size: 65%;
-}
-
-#iiizjlmkvy .gt_footnote_marks {
-  font-style: italic;
-  font-weight: normal;
-  font-size: 75%;
-  vertical-align: 0.4em;
-}
-
-#iiizjlmkvy .gt_asterisk {
-  font-size: 100%;
-  vertical-align: 0;
-}
-
-#iiizjlmkvy .gt_indent_1 {
-  text-indent: 5px;
-}
-
-#iiizjlmkvy .gt_indent_2 {
-  text-indent: 10px;
-}
-
-#iiizjlmkvy .gt_indent_3 {
-  text-indent: 15px;
-}
-
-#iiizjlmkvy .gt_indent_4 {
-  text-indent: 20px;
-}
-
-#iiizjlmkvy .gt_indent_5 {
-  text-indent: 25px;
-}
-</style>
-<table class="gt_table">
-  
-  <thead class="gt_col_headings">
-    <tr>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Beta&lt;/strong&gt;"><strong>Beta</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;sup class=&quot;gt_footnote_marks&quot;&gt;1&lt;/sup&gt;"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;p-value&lt;/strong&gt;"><strong>p-value</strong></th>
-    </tr>
-  </thead>
-  <tbody class="gt_table_body">
-    <tr><td headers="label" class="gt_row gt_left">device_year</td>
-<td headers="estimate" class="gt_row gt_center">-1.5</td>
-<td headers="ci" class="gt_row gt_center">-2.4, -0.67</td>
-<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
-  </tbody>
-  
-  <tfoot class="gt_footnotes">
-    <tr>
-      <td class="gt_footnote" colspan="4"><sup class="gt_footnote_marks">1</sup> CI = Confidence Interval</td>
-    </tr>
-  </tfoot>
-</table>
-</div>
-```
-
-## MLM Regression: Device year as a predictor of Step Count MAPE and author_year as a random effect
-
-
-```r
-lmer_year_MAPE <- lmer(MAPE ~ device_year + (1 | study_year), data = clean_data)
-
-summary(lmer_year_MAPE)
+tidy(lm_year_MAPE, conf.int = TRUE)
 ```
 
 ```
-## Linear mixed model fit by REML ['lmerMod']
-## Formula: MAPE ~ device_year + (1 | study_year)
-##    Data: clean_data
-## 
-## REML criterion at convergence: 8089.8
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -2.7824 -0.2363 -0.0751 -0.0117  5.2967 
-## 
-## Random effects:
-##  Groups     Name        Variance Std.Dev.
-##  study_year (Intercept) 118.6    10.89   
-##  Residual               228.2    15.11   
-## Number of obs: 962, groups:  study_year, 104
-## 
-## Fixed effects:
-##               Estimate Std. Error t value
-## (Intercept)  173.97546 1237.90021   0.141
-## device_year   -0.08193    0.61490  -0.133
-## 
-## Correlation of Fixed Effects:
-##             (Intr)
-## device_year -1.000
+## # A tibble: 2 × 7
+##   term          estimate std.error statistic  p.value conf.low conf.high
+##   <chr>            <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
+## 1 (Intercept)      14.2      1.82       7.79 1.79e-14    10.6     17.7  
+## 2 device_year_c    -1.54     0.506     -3.04 2.45e- 3    -2.53    -0.544
 ```
 
 ```r
-tbl_regression(lmer_year_MAPE)
-```
+clean_data_m1 <- augment(lm_year_MAPE, newdata = clean_data, interval = "prediction")
 
-```{=html}
-<div id="rdjvslcndl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#rdjvslcndl .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #333333;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  background-color: #FFFFFF;
-  width: auto;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_caption {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#rdjvslcndl .gt_title {
-  color: #333333;
-  font-size: 125%;
-  font-weight: initial;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#rdjvslcndl .gt_subtitle {
-  color: #333333;
-  font-size: 85%;
-  font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#rdjvslcndl .gt_bottom_border {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_col_headings {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_col_heading {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow-x: hidden;
-}
-
-#rdjvslcndl .gt_column_spanner_outer {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-#rdjvslcndl .gt_column_spanner_outer:first-child {
-  padding-left: 0;
-}
-
-#rdjvslcndl .gt_column_spanner_outer:last-child {
-  padding-right: 0;
-}
-
-#rdjvslcndl .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow-x: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-#rdjvslcndl .gt_group_heading {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  text-align: left;
-}
-
-#rdjvslcndl .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#rdjvslcndl .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#rdjvslcndl .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#rdjvslcndl .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin: 10px;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  overflow-x: hidden;
-}
-
-#rdjvslcndl .gt_stub {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#rdjvslcndl .gt_stub_row_group {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-  vertical-align: top;
-}
-
-#rdjvslcndl .gt_row_group_first td {
-  border-top-width: 2px;
-}
-
-#rdjvslcndl .gt_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#rdjvslcndl .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_first_summary_row.thick {
-  border-top-width: 2px;
-}
-
-#rdjvslcndl .gt_last_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_grand_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#rdjvslcndl .gt_first_grand_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
-#rdjvslcndl .gt_table_body {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_footnotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_footnote {
-  margin: 0px;
-  font-size: 90%;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#rdjvslcndl .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#rdjvslcndl .gt_sourcenote {
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#rdjvslcndl .gt_left {
-  text-align: left;
-}
-
-#rdjvslcndl .gt_center {
-  text-align: center;
-}
-
-#rdjvslcndl .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#rdjvslcndl .gt_font_normal {
-  font-weight: normal;
-}
-
-#rdjvslcndl .gt_font_bold {
-  font-weight: bold;
-}
-
-#rdjvslcndl .gt_font_italic {
-  font-style: italic;
-}
-
-#rdjvslcndl .gt_super {
-  font-size: 65%;
-}
-
-#rdjvslcndl .gt_footnote_marks {
-  font-style: italic;
-  font-weight: normal;
-  font-size: 75%;
-  vertical-align: 0.4em;
-}
-
-#rdjvslcndl .gt_asterisk {
-  font-size: 100%;
-  vertical-align: 0;
-}
-
-#rdjvslcndl .gt_indent_1 {
-  text-indent: 5px;
-}
-
-#rdjvslcndl .gt_indent_2 {
-  text-indent: 10px;
-}
-
-#rdjvslcndl .gt_indent_3 {
-  text-indent: 15px;
-}
-
-#rdjvslcndl .gt_indent_4 {
-  text-indent: 20px;
-}
-
-#rdjvslcndl .gt_indent_5 {
-  text-indent: 25px;
-}
-</style>
-<table class="gt_table">
-  
-  <thead class="gt_col_headings">
-    <tr>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Beta&lt;/strong&gt;"><strong>Beta</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;sup class=&quot;gt_footnote_marks&quot;&gt;1&lt;/sup&gt;"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
-    </tr>
-  </thead>
-  <tbody class="gt_table_body">
-    <tr><td headers="label" class="gt_row gt_left">device_year</td>
-<td headers="estimate" class="gt_row gt_center">-0.08</td>
-<td headers="ci" class="gt_row gt_center">-1.3, 1.1</td></tr>
-  </tbody>
-  
-  <tfoot class="gt_footnotes">
-    <tr>
-      <td class="gt_footnote" colspan="3"><sup class="gt_footnote_marks">1</sup> CI = Confidence Interval</td>
-    </tr>
-  </tfoot>
-</table>
-</div>
-```
-
-```r
-predicted_data <- lmer_year_MAPE@frame
-predicted_data$fitted <- fitted(lmer_year_MAPE)
-```
-
-## Scatter plot of fitted values
-
-
-```r
-scatter_fitted_year <- ggplot(data = predicted_data, aes(x = device_year, y = MAPE)) +
+scatter_fitted_year <- ggplot(data = clean_data_m1, aes(x = device_year, y = MAPE)) +
       geom_point(alpha = 0.2) +
-      stat_smooth(method = "lm", colour = "red") 
+      stat_smooth(method = "lm", colour = "gray") +
+      theme_bw()
 
 plot(scatter_fitted_year)
 ```
@@ -1371,596 +479,166 @@ plot(scatter_fitted_year)
 ## `geom_smooth()` using formula = 'y ~ x'
 ```
 
-![](device_validity_time_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+![](device_validity_time_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
-
-### Linear Regression: Analyzing SC MAPE with Brand as a predictor
+## Model 2: Linear Regression - Device year as a predictor of Step Count MAPE + Wear location control
 
 
 ```r
-lm_Brand_MAPE <- lm(MAPE ~ Brand, data = clean_data)
+lm_year_MAPE_loc <- lm(MAPE ~ device_year_c + Wear_Location, data = clean_data, na.action = na.exclude)
 
-summary(lm_Brand_MAPE)
+summary(lm_year_MAPE_loc)
 ```
 
 ```
 ## 
 ## Call:
-## lm(formula = MAPE ~ Brand, data = clean_data)
+## lm(formula = MAPE ~ device_year_c + Wear_Location, data = clean_data, 
+##     na.action = na.exclude)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -14.261 -10.363  -6.054  -1.105  91.020 
+## -20.579  -7.895  -6.047  -1.148  92.035 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(>|t|)  
-## (Intercept)     1.6205     4.1629   0.389   0.6972  
-## BrandFitbit     8.9332     4.2360   2.109   0.0352 *
-## BrandGarmin     3.0546     4.4596   0.685   0.4935  
-## BrandMisfit    12.6429     5.1603   2.450   0.0145 *
-## BrandPolar      4.3828     5.1603   0.849   0.3959  
-## BrandSamsung    0.7186     6.5381   0.110   0.9125  
-## BrandWithings   7.1992     4.7272   1.523   0.1281  
+##                        Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             21.8751     2.9557   7.401 3.01e-13 ***
+## device_year_c           -0.6454     0.6376  -1.012   0.3117    
+## Wear_LocationThigh      10.8787    19.2475   0.565   0.5721    
+## Wear_LocationTorso      -2.7079     3.2039  -0.845   0.3982    
+## Wear_LocationUpper Arm -21.2097     8.2318  -2.577   0.0101 *  
+## Wear_LocationWaist/Hip -11.9736     2.6994  -4.436 1.03e-05 ***
+## Wear_LocationWrist     -12.5477     2.7508  -4.561 5.76e-06 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 19.53 on 958 degrees of freedom
-##   (91 observations deleted due to missingness)
-## Multiple R-squared:  0.02048,	Adjusted R-squared:  0.01435 
-## F-statistic: 3.338 on 6 and 958 DF,  p-value: 0.002927
+## Residual standard error: 19.09 on 937 degrees of freedom
+## Multiple R-squared:  0.05022,	Adjusted R-squared:  0.04414 
+## F-statistic: 8.258 on 6 and 937 DF,  p-value: 9.892e-09
 ```
 
-### Linear Regression: Analyzing differences in SC MAPE with device year and brand as factors
+```r
+tidy(lm_year_MAPE_loc, conf.int = TRUE)
+```
+
+```
+## # A tibble: 7 × 7
+##   term                   estimate std.error statistic  p.value conf.low conf.h…¹
+##   <chr>                     <dbl>     <dbl>     <dbl>    <dbl>    <dbl>    <dbl>
+## 1 (Intercept)              21.9       2.96      7.40  3.01e-13    16.1    27.7  
+## 2 device_year_c            -0.645     0.638    -1.01  3.12e- 1    -1.90    0.606
+## 3 Wear_LocationThigh       10.9      19.2       0.565 5.72e- 1   -26.9    48.7  
+## 4 Wear_LocationTorso       -2.71      3.20     -0.845 3.98e- 1    -9.00    3.58 
+## 5 Wear_LocationUpper Arm  -21.2       8.23     -2.58  1.01e- 2   -37.4    -5.05 
+## 6 Wear_LocationWaist/Hip  -12.0       2.70     -4.44  1.03e- 5   -17.3    -6.68 
+## 7 Wear_LocationWrist      -12.5       2.75     -4.56  5.76e- 6   -17.9    -7.15 
+## # … with abbreviated variable name ¹​conf.high
+```
+
+```r
+clean_data_m2 <- augment(lm_year_MAPE_loc, newdata = clean_data, interval = "prediction")
+
+scatter_fitted_year_loc <- ggplot(data = clean_data_m2, aes(x = device_year, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "gray") +
+      theme_bw()
+
+plot(scatter_fitted_year_loc)
+```
+
+```
+## `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](device_validity_time_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+
+## Model 3:  Linear Regression - Analyzing differences in SC MAPE with device year and brand as factors
 
 
 ```r
-## MLM Regression: Device year as a predictor of Step Count MAPE and author_year as a random effect
-
-lmer_year_by_brand_MAPE <- lmer(MAPE ~ device_year*Brand + (1 | study_year), data = clean_data)
+lmer_year_by_brand_MAPE <- lm(MAPE ~ device_year_c*Brand + Wear_Location, data = clean_data)
 
 summary(lmer_year_by_brand_MAPE)
 ```
 
 ```
-## Linear mixed model fit by REML ['lmerMod']
-## Formula: MAPE ~ device_year * Brand + (1 | study_year)
-##    Data: clean_data
 ## 
-## REML criterion at convergence: 8033.3
+## Call:
+## lm(formula = MAPE ~ device_year_c * Brand + Wear_Location, data = clean_data)
 ## 
-## Scaled residuals: 
+## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -2.8694 -0.2380 -0.0851  0.0301  5.2898 
+## -20.413  -8.126  -5.810  -0.009  91.867 
 ## 
-## Random effects:
-##  Groups     Name        Variance Std.Dev.
-##  study_year (Intercept) 119.6    10.94   
-##  Residual               230.1    15.17   
-## Number of obs: 962, groups:  study_year, 104
+## Coefficients:
+##                             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                  21.0830    98.2397   0.215   0.8301    
+## device_year_c                -1.2577    19.4456  -0.065   0.9484    
+## BrandFitbit                  -3.2801    98.2594  -0.033   0.9734    
+## BrandGarmin                   7.1651    98.5879   0.073   0.9421    
+## BrandMisfit                  18.0624    98.4785   0.183   0.8545    
+## BrandPolar                   -2.1909    98.5460  -0.022   0.9823    
+## BrandSamsung                 -3.2497   104.5815  -0.031   0.9752    
+## BrandWithings                36.4653    99.5623   0.366   0.7143    
+## Wear_LocationThigh           10.2640    19.1565   0.536   0.5922    
+## Wear_LocationTorso           -3.2014     3.1954  -1.002   0.3167    
+## Wear_LocationUpper Arm      -18.6998     8.2401  -2.269   0.0235 *  
+## Wear_LocationWaist/Hip      -12.4205     2.7302  -4.549 6.10e-06 ***
+## Wear_LocationWrist          -13.1171     2.9387  -4.464 9.05e-06 ***
+## device_year_c:BrandFitbit     2.1746    19.4638   0.112   0.9111    
+## device_year_c:BrandGarmin    -1.0281    19.5378  -0.053   0.9580    
+## device_year_c:BrandMisfit    -4.0671    19.6516  -0.207   0.8361    
+## device_year_c:BrandPolar      1.3313    19.6061   0.068   0.9459    
+## device_year_c:BrandSamsung    0.7091    21.1142   0.034   0.9732    
+## device_year_c:BrandWithings  -9.5470    20.0041  -0.477   0.6333    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Fixed effects:
-##                             Estimate Std. Error t value
-## (Intercept)                6142.2900 35808.2152   0.172
-## device_year                  -3.0448    17.7704  -0.171
-## BrandFitbit               -6707.4177 35845.0989  -0.187
-## BrandGarmin               -6980.4793 35976.5346  -0.194
-## BrandMisfit               -5322.8555 36321.7900  -0.147
-## BrandPolar                -9757.6078 36307.8766  -0.269
-## BrandSamsung              -1084.9111 36220.7141  -0.030
-## BrandWithings             -1126.5861 37001.0255  -0.030
-## device_year:BrandFitbit       3.3301    17.7887   0.187
-## device_year:BrandGarmin       3.4646    17.8540   0.194
-## device_year:BrandMisfit       2.6422    18.0258   0.147
-## device_year:BrandPolar        4.8461    18.0188   0.269
-## device_year:BrandSamsung      0.5383    17.9756   0.030
-## device_year:BrandWithings     0.5588    18.3633   0.030
-```
-
-```
-## 
-## Correlation matrix not shown by default, as p = 14 > 12.
-## Use print(x, correlation=TRUE)  or
-##     vcov(x)        if you need it
+## Residual standard error: 19 on 925 degrees of freedom
+## Multiple R-squared:  0.07136,	Adjusted R-squared:  0.05328 
+## F-statistic: 3.949 on 18 and 925 DF,  p-value: 6.502e-08
 ```
 
 ```r
-tbl_regression(lmer_year_by_brand_MAPE)
+tidy(lmer_year_by_brand_MAPE, conf.int = TRUE)
 ```
 
-```{=html}
-<div id="kficwduvdw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#kficwduvdw .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #333333;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  background-color: #FFFFFF;
-  width: auto;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_caption {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#kficwduvdw .gt_title {
-  color: #333333;
-  font-size: 125%;
-  font-weight: initial;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#kficwduvdw .gt_subtitle {
-  color: #333333;
-  font-size: 85%;
-  font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#kficwduvdw .gt_bottom_border {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_col_headings {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_col_heading {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow-x: hidden;
-}
-
-#kficwduvdw .gt_column_spanner_outer {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-#kficwduvdw .gt_column_spanner_outer:first-child {
-  padding-left: 0;
-}
-
-#kficwduvdw .gt_column_spanner_outer:last-child {
-  padding-right: 0;
-}
-
-#kficwduvdw .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow-x: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-#kficwduvdw .gt_group_heading {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  text-align: left;
-}
-
-#kficwduvdw .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#kficwduvdw .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#kficwduvdw .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#kficwduvdw .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin: 10px;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  overflow-x: hidden;
-}
-
-#kficwduvdw .gt_stub {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#kficwduvdw .gt_stub_row_group {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-  vertical-align: top;
-}
-
-#kficwduvdw .gt_row_group_first td {
-  border-top-width: 2px;
-}
-
-#kficwduvdw .gt_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#kficwduvdw .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_first_summary_row.thick {
-  border-top-width: 2px;
-}
-
-#kficwduvdw .gt_last_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_grand_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#kficwduvdw .gt_first_grand_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
-#kficwduvdw .gt_table_body {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_footnotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_footnote {
-  margin: 0px;
-  font-size: 90%;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#kficwduvdw .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#kficwduvdw .gt_sourcenote {
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#kficwduvdw .gt_left {
-  text-align: left;
-}
-
-#kficwduvdw .gt_center {
-  text-align: center;
-}
-
-#kficwduvdw .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#kficwduvdw .gt_font_normal {
-  font-weight: normal;
-}
-
-#kficwduvdw .gt_font_bold {
-  font-weight: bold;
-}
-
-#kficwduvdw .gt_font_italic {
-  font-style: italic;
-}
-
-#kficwduvdw .gt_super {
-  font-size: 65%;
-}
-
-#kficwduvdw .gt_footnote_marks {
-  font-style: italic;
-  font-weight: normal;
-  font-size: 75%;
-  vertical-align: 0.4em;
-}
-
-#kficwduvdw .gt_asterisk {
-  font-size: 100%;
-  vertical-align: 0;
-}
-
-#kficwduvdw .gt_indent_1 {
-  text-indent: 5px;
-}
-
-#kficwduvdw .gt_indent_2 {
-  text-indent: 10px;
-}
-
-#kficwduvdw .gt_indent_3 {
-  text-indent: 15px;
-}
-
-#kficwduvdw .gt_indent_4 {
-  text-indent: 20px;
-}
-
-#kficwduvdw .gt_indent_5 {
-  text-indent: 25px;
-}
-</style>
-<table class="gt_table">
-  
-  <thead class="gt_col_headings">
-    <tr>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Beta&lt;/strong&gt;"><strong>Beta</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;sup class=&quot;gt_footnote_marks&quot;&gt;1&lt;/sup&gt;"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
-    </tr>
-  </thead>
-  <tbody class="gt_table_body">
-    <tr><td headers="label" class="gt_row gt_left">device_year</td>
-<td headers="estimate" class="gt_row gt_center">-3.0</td>
-<td headers="ci" class="gt_row gt_center">-38, 32</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">Brand</td>
-<td headers="estimate" class="gt_row gt_center"></td>
-<td headers="ci" class="gt_row gt_center"></td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Apple</td>
-<td headers="estimate" class="gt_row gt_center">—</td>
-<td headers="ci" class="gt_row gt_center">—</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Fitbit</td>
-<td headers="estimate" class="gt_row gt_center">-6,707</td>
-<td headers="ci" class="gt_row gt_center">-76,963, 63,548</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Garmin</td>
-<td headers="estimate" class="gt_row gt_center">-6,980</td>
-<td headers="ci" class="gt_row gt_center">-77,493, 63,532</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Misfit</td>
-<td headers="estimate" class="gt_row gt_center">-5,323</td>
-<td headers="ci" class="gt_row gt_center">-76,512, 65,867</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Polar</td>
-<td headers="estimate" class="gt_row gt_center">-9,758</td>
-<td headers="ci" class="gt_row gt_center">-80,920, 61,405</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Samsung</td>
-<td headers="estimate" class="gt_row gt_center">-1,085</td>
-<td headers="ci" class="gt_row gt_center">-72,076, 69,906</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Withings</td>
-<td headers="estimate" class="gt_row gt_center">-1,127</td>
-<td headers="ci" class="gt_row gt_center">-73,647, 71,394</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">device_year * Brand</td>
-<td headers="estimate" class="gt_row gt_center"></td>
-<td headers="ci" class="gt_row gt_center"></td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    device_year * Fitbit</td>
-<td headers="estimate" class="gt_row gt_center">3.3</td>
-<td headers="ci" class="gt_row gt_center">-32, 38</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    device_year * Garmin</td>
-<td headers="estimate" class="gt_row gt_center">3.5</td>
-<td headers="ci" class="gt_row gt_center">-32, 38</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    device_year * Misfit</td>
-<td headers="estimate" class="gt_row gt_center">2.6</td>
-<td headers="ci" class="gt_row gt_center">-33, 38</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    device_year * Polar</td>
-<td headers="estimate" class="gt_row gt_center">4.8</td>
-<td headers="ci" class="gt_row gt_center">-30, 40</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    device_year * Samsung</td>
-<td headers="estimate" class="gt_row gt_center">0.54</td>
-<td headers="ci" class="gt_row gt_center">-35, 36</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    device_year * Withings</td>
-<td headers="estimate" class="gt_row gt_center">0.56</td>
-<td headers="ci" class="gt_row gt_center">-35, 37</td></tr>
-  </tbody>
-  
-  <tfoot class="gt_footnotes">
-    <tr>
-      <td class="gt_footnote" colspan="3"><sup class="gt_footnote_marks">1</sup> CI = Confidence Interval</td>
-    </tr>
-  </tfoot>
-</table>
-</div>
+```
+## # A tibble: 19 × 7
+##    term                        estimate std.er…¹ stati…² p.value conf.…³ conf.…⁴
+##    <chr>                          <dbl>    <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+##  1 (Intercept)                   21.1      98.2   0.215  8.30e-1 -172.    214.  
+##  2 device_year_c                 -1.26     19.4  -0.0647 9.48e-1  -39.4    36.9 
+##  3 BrandFitbit                   -3.28     98.3  -0.0334 9.73e-1 -196.    190.  
+##  4 BrandGarmin                    7.17     98.6   0.0727 9.42e-1 -186.    201.  
+##  5 BrandMisfit                   18.1      98.5   0.183  8.55e-1 -175.    211.  
+##  6 BrandPolar                    -2.19     98.5  -0.0222 9.82e-1 -196.    191.  
+##  7 BrandSamsung                  -3.25    105.   -0.0311 9.75e-1 -208.    202.  
+##  8 BrandWithings                 36.5      99.6   0.366  7.14e-1 -159.    232.  
+##  9 Wear_LocationThigh            10.3      19.2   0.536  5.92e-1  -27.3    47.9 
+## 10 Wear_LocationTorso            -3.20      3.20 -1.00   3.17e-1   -9.47    3.07
+## 11 Wear_LocationUpper Arm       -18.7       8.24 -2.27   2.35e-2  -34.9    -2.53
+## 12 Wear_LocationWaist/Hip       -12.4       2.73 -4.55   6.10e-6  -17.8    -7.06
+## 13 Wear_LocationWrist           -13.1       2.94 -4.46   9.05e-6  -18.9    -7.35
+## 14 device_year_c:BrandFitbit      2.17     19.5   0.112  9.11e-1  -36.0    40.4 
+## 15 device_year_c:BrandGarmin     -1.03     19.5  -0.0526 9.58e-1  -39.4    37.3 
+## 16 device_year_c:BrandMisfit     -4.07     19.7  -0.207  8.36e-1  -42.6    34.5 
+## 17 device_year_c:BrandPolar       1.33     19.6   0.0679 9.46e-1  -37.1    39.8 
+## 18 device_year_c:BrandSamsung     0.709    21.1   0.0336 9.73e-1  -40.7    42.1 
+## 19 device_year_c:BrandWithings   -9.55     20.0  -0.477  6.33e-1  -48.8    29.7 
+## # … with abbreviated variable names ¹​std.error, ²​statistic, ³​conf.low,
+## #   ⁴​conf.high
 ```
 
 ```r
-predicted_data_brand <- lmer_year_by_brand_MAPE@frame
-predicted_data_brand$fitted <- fitted(lmer_year_by_brand_MAPE)
-```
+clean_data_m3 <- augment(lmer_year_by_brand_MAPE, newdata = clean_data, interval = "prediction")
 
-
-```r
-scatter_fitted_year_brand <- ggplot(data = predicted_data_brand, aes(x = device_year, y = fitted)) +
+scatter_fitted_year_loc_brand <- ggplot(data = clean_data_m3, aes(x = device_year, y = MAPE)) +
       geom_point(alpha = 0.2) +
-      stat_smooth(method = "lm", colour = "red") +
-      facet_wrap(~ Brand)
+      stat_smooth(method = "lm", colour = "gray") +
+      theme_bw()
 
-plot(scatter_fitted_year_brand)
+plot(scatter_fitted_year_loc_brand)
 ```
 
 ```
@@ -1969,5 +647,123 @@ plot(scatter_fitted_year_brand)
 
 ![](device_validity_time_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
+## Subset of Fitbit data
 
+
+```r
+clean_data_fitbit <- subset(clean_data, Brand == "Fitbit")
+```
+
+### Model 4: Linear Regression - Device year as a predictor of Step Count MAPE
+
+
+```r
+lm_year_MAPE_fb <- lm(MAPE ~ device_year_c + Wear_Location, data = clean_data_fitbit)
+
+summary(lm_year_MAPE_fb)
+```
+
+```
+## 
+## Call:
+## lm(formula = MAPE ~ device_year_c + Wear_Location, data = clean_data_fitbit)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -20.112  -9.207  -7.137   0.303  90.784 
+## 
+## Coefficients:
+##                        Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             17.4187     3.5858   4.858 1.52e-06 ***
+## device_year_c            1.0643     0.9426   1.129 0.259316    
+## Wear_LocationThigh      10.2060    20.5674   0.496 0.619921    
+## Wear_LocationTorso      -5.6854     3.4972  -1.626 0.104551    
+## Wear_LocationUpper Arm -18.4630     8.8576  -2.084 0.037549 *  
+## Wear_LocationWaist/Hip -11.3955     2.9608  -3.849 0.000132 ***
+## Wear_LocationWrist     -13.4375     3.2362  -4.152 3.77e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 20.4 on 594 degrees of freedom
+## Multiple R-squared:  0.04062,	Adjusted R-squared:  0.03093 
+## F-statistic: 4.191 on 6 and 594 DF,  p-value: 0.0003859
+```
+
+```r
+tidy(lm_year_MAPE_fb, conf.int = TRUE)
+```
+
+```
+## # A tibble: 7 × 7
+##   term                   estimate std.error statistic    p.value conf.…¹ conf.…²
+##   <chr>                     <dbl>     <dbl>     <dbl>      <dbl>   <dbl>   <dbl>
+## 1 (Intercept)               17.4      3.59      4.86  0.00000152  10.4     24.5 
+## 2 device_year_c              1.06     0.943     1.13  0.259       -0.787    2.92
+## 3 Wear_LocationThigh        10.2     20.6       0.496 0.620      -30.2     50.6 
+## 4 Wear_LocationTorso        -5.69     3.50     -1.63  0.105      -12.6      1.18
+## 5 Wear_LocationUpper Arm   -18.5      8.86     -2.08  0.0375     -35.9     -1.07
+## 6 Wear_LocationWaist/Hip   -11.4      2.96     -3.85  0.000132   -17.2     -5.58
+## 7 Wear_LocationWrist       -13.4      3.24     -4.15  0.0000377  -19.8     -7.08
+## # … with abbreviated variable names ¹​conf.low, ²​conf.high
+```
+
+```r
+clean_data_m4 <- augment(lm_year_MAPE_fb, newdata = clean_data_fitbit, interval = "prediction")
+
+scatter_fitted_fb <- ggplot(data = clean_data_m4, aes(x = device_year, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "gray") +
+      theme_bw()
+
+plot(scatter_fitted_fb)
+```
+
+```
+## `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](device_validity_time_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+
+## Table 2: Creating model table
+
+
+```r
+m1 <- tbl_regression(lm_year_MAPE) 
+m2 <- tbl_regression(lm_year_MAPE_loc) 
+m3 <- tbl_regression(lmer_year_by_brand_MAPE) 
+m4 <- tbl_regression(lm_year_MAPE_fb) 
+
+
+tbl_2_multi <- tbl_merge(list(m1, m2, m3, m4))
+
+tbl_2_multi %>% as_kable()
+```
+
+
+
+|**Characteristic**       | **Beta** | **95% CI**  | **p-value** | **Beta** | **95% CI** | **p-value** | **Beta** | **95% CI** | **p-value** | **Beta** | **95% CI** | **p-value** |
+|:------------------------|:--------:|:-----------:|:-----------:|:--------:|:----------:|:-----------:|:--------:|:----------:|:-----------:|:--------:|:----------:|:-----------:|
+|device_year_c            |   -1.5   | -2.5, -0.54 |    0.002    |  -0.65   | -1.9, 0.61 |     0.3     |   -1.3   |  -39, 37   |    >0.9     |   1.1    | -0.79, 2.9 |     0.3     |
+|Wear_Location            |          |             |             |          |            |             |          |            |             |          |            |             |
+|LAF                      |          |             |             |    —     |     —      |             |    —     |     —      |             |    —     |     —      |             |
+|Thigh                    |          |             |             |    11    |  -27, 49   |     0.6     |    10    |  -27, 48   |     0.6     |    10    |  -30, 51   |     0.6     |
+|Torso                    |          |             |             |   -2.7   | -9.0, 3.6  |     0.4     |   -3.2   | -9.5, 3.1  |     0.3     |   -5.7   |  -13, 1.2  |    0.10     |
+|Upper Arm                |          |             |             |   -21    | -37, -5.1  |    0.010    |   -19    | -35, -2.5  |    0.023    |   -18    | -36, -1.1  |    0.038    |
+|Waist/Hip                |          |             |             |   -12    | -17, -6.7  |   <0.001    |   -12    | -18, -7.1  |   <0.001    |   -11    | -17, -5.6  |   <0.001    |
+|Wrist                    |          |             |             |   -13    | -18, -7.1  |   <0.001    |   -13    | -19, -7.3  |   <0.001    |   -13    | -20, -7.1  |   <0.001    |
+|Brand                    |          |             |             |          |            |             |          |            |             |          |            |             |
+|Apple                    |          |             |             |          |            |             |    —     |     —      |             |          |            |             |
+|Fitbit                   |          |             |             |          |            |             |   -3.3   | -196, 190  |    >0.9     |          |            |             |
+|Garmin                   |          |             |             |          |            |             |   7.2    | -186, 201  |    >0.9     |          |            |             |
+|Misfit                   |          |             |             |          |            |             |    18    | -175, 211  |     0.9     |          |            |             |
+|Polar                    |          |             |             |          |            |             |   -2.2   | -196, 191  |    >0.9     |          |            |             |
+|Samsung                  |          |             |             |          |            |             |   -3.2   | -208, 202  |    >0.9     |          |            |             |
+|Withings                 |          |             |             |          |            |             |    36    | -159, 232  |     0.7     |          |            |             |
+|device_year_c * Brand    |          |             |             |          |            |             |          |            |             |          |            |             |
+|device_year_c * Fitbit   |          |             |             |          |            |             |   2.2    |  -36, 40   |    >0.9     |          |            |             |
+|device_year_c * Garmin   |          |             |             |          |            |             |   -1.0   |  -39, 37   |    >0.9     |          |            |             |
+|device_year_c * Misfit   |          |             |             |          |            |             |   -4.1   |  -43, 34   |     0.8     |          |            |             |
+|device_year_c * Polar    |          |             |             |          |            |             |   1.3    |  -37, 40   |    >0.9     |          |            |             |
+|device_year_c * Samsung  |          |             |             |          |            |             |   0.71   |  -41, 42   |    >0.9     |          |            |             |
+|device_year_c * Withings |          |             |             |          |            |             |   -9.5   |  -49, 30   |     0.6     |          |            |             |
 
