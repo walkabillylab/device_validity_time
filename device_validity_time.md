@@ -59,6 +59,13 @@ library(rstatix)
 
 ```r
 library(gtsummary)
+```
+
+```
+## #Uighur
+```
+
+```r
 library(knitr)
 ```
 
@@ -422,6 +429,39 @@ summary(clean_data$device_year_c)
 ##   1.000   3.000   3.000   3.371   4.000   6.000
 ```
 
+## Recoding device year as continuous 
+
+
+```r
+table(clean_data$Wear_Location)
+```
+
+```
+## 
+##       LAF     Thigh     Torso Upper Arm Waist/Hip     Wrist 
+##        61         1        85         6       278       513
+```
+
+```r
+clean_data <- clean_data %>%
+	mutate(wear_location_c = case_when(
+		Wear_Location == "LAF" ~ "Leg_Thigh",
+		Wear_Location == "Thigh" ~ "Leg_Thigh",
+		Wear_Location == "Torso" ~ "Torso",
+		Wear_Location == "Upper Arm" ~ "Wrist_Arm",
+		Wear_Location == "Waist/Hip" ~ "Waist/Hip",
+		Wear_Location == "Wrist" ~ "Wrist_Arm",
+	))
+
+table(clean_data$wear_location_c)
+```
+
+```
+## 
+## Leg_Thigh     Torso Waist/Hip Wrist_Arm 
+##        62        85       278       519
+```
+
 ## Model 1: Linear Regression Device year as a predictor of Step Count MAPE
 
 
@@ -479,13 +519,22 @@ plot(scatter_fitted_year)
 ## `geom_smooth()` using formula = 'y ~ x'
 ```
 
-![](device_validity_time_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+![](device_validity_time_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+
+```r
+ggsave("scatter_fitted_year.pdf", scatter_fitted_year, dpi = 300)
+```
+
+```
+## Saving 7 x 5 in image
+## `geom_smooth()` using formula = 'y ~ x'
+```
 
 ## Model 2: Linear Regression - Device year as a predictor of Step Count MAPE + Wear location control
 
 
 ```r
-lm_year_MAPE_loc <- lm(MAPE ~ device_year_c + Wear_Location, data = clean_data, na.action = na.exclude)
+lm_year_MAPE_loc <- lm(MAPE ~ device_year_c + wear_location_c, data = clean_data, na.action = na.exclude)
 
 summary(lm_year_MAPE_loc)
 ```
@@ -493,28 +542,26 @@ summary(lm_year_MAPE_loc)
 ```
 ## 
 ## Call:
-## lm(formula = MAPE ~ device_year_c + Wear_Location, data = clean_data, 
+## lm(formula = MAPE ~ device_year_c + wear_location_c, data = clean_data, 
 ##     na.action = na.exclude)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -20.579  -7.895  -6.047  -1.148  92.035 
+## -20.650  -7.953  -6.098  -1.235  91.957 
 ## 
 ## Coefficients:
-##                        Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)             21.8751     2.9557   7.401 3.01e-13 ***
-## device_year_c           -0.6454     0.6376  -1.012   0.3117    
-## Wear_LocationThigh      10.8787    19.2475   0.565   0.5721    
-## Wear_LocationTorso      -2.7079     3.2039  -0.845   0.3982    
-## Wear_LocationUpper Arm -21.2097     8.2318  -2.577   0.0101 *  
-## Wear_LocationWaist/Hip -11.9736     2.6994  -4.436 1.03e-05 ***
-## Wear_LocationWrist     -12.5477     2.7508  -4.561 5.76e-06 ***
+##                          Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)               21.6051     2.9128   7.417 2.67e-13 ***
+## device_year_c             -0.4749     0.6182  -0.768    0.443    
+## wear_location_cTorso      -2.8671     3.1879  -0.899    0.369    
+## wear_location_cWaist/Hip -12.1372     2.6808  -4.527 6.74e-06 ***
+## wear_location_cWrist_Arm -13.0673     2.7128  -4.817 1.70e-06 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 19.09 on 937 degrees of freedom
-## Multiple R-squared:  0.05022,	Adjusted R-squared:  0.04414 
-## F-statistic: 8.258 on 6 and 937 DF,  p-value: 9.892e-09
+## Residual standard error: 19.08 on 939 degrees of freedom
+## Multiple R-squared:  0.04874,	Adjusted R-squared:  0.04469 
+## F-statistic: 12.03 on 4 and 939 DF,  p-value: 1.547e-09
 ```
 
 ```r
@@ -522,17 +569,15 @@ tidy(lm_year_MAPE_loc, conf.int = TRUE)
 ```
 
 ```
-## # A tibble: 7 × 7
-##   term                   estimate std.error statistic  p.value conf.low conf.h…¹
-##   <chr>                     <dbl>     <dbl>     <dbl>    <dbl>    <dbl>    <dbl>
-## 1 (Intercept)              21.9       2.96      7.40  3.01e-13    16.1    27.7  
-## 2 device_year_c            -0.645     0.638    -1.01  3.12e- 1    -1.90    0.606
-## 3 Wear_LocationThigh       10.9      19.2       0.565 5.72e- 1   -26.9    48.7  
-## 4 Wear_LocationTorso       -2.71      3.20     -0.845 3.98e- 1    -9.00    3.58 
-## 5 Wear_LocationUpper Arm  -21.2       8.23     -2.58  1.01e- 2   -37.4    -5.05 
-## 6 Wear_LocationWaist/Hip  -12.0       2.70     -4.44  1.03e- 5   -17.3    -6.68 
-## 7 Wear_LocationWrist      -12.5       2.75     -4.56  5.76e- 6   -17.9    -7.15 
-## # … with abbreviated variable name ¹​conf.high
+## # A tibble: 5 × 7
+##   term                     estimate std.error statistic  p.value conf.…¹ conf.…²
+##   <chr>                       <dbl>     <dbl>     <dbl>    <dbl>   <dbl>   <dbl>
+## 1 (Intercept)                21.6       2.91      7.42  2.67e-13   15.9   27.3  
+## 2 device_year_c              -0.475     0.618    -0.768 4.43e- 1   -1.69   0.738
+## 3 wear_location_cTorso       -2.87      3.19     -0.899 3.69e- 1   -9.12   3.39 
+## 4 wear_location_cWaist/Hip  -12.1       2.68     -4.53  6.74e- 6  -17.4   -6.88 
+## 5 wear_location_cWrist_Arm  -13.1       2.71     -4.82  1.70e- 6  -18.4   -7.74 
+## # … with abbreviated variable names ¹​conf.low, ²​conf.high
 ```
 
 ```r
@@ -550,13 +595,13 @@ plot(scatter_fitted_year_loc)
 ## `geom_smooth()` using formula = 'y ~ x'
 ```
 
-![](device_validity_time_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+![](device_validity_time_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
 ## Model 3:  Linear Regression - Analyzing differences in SC MAPE with device year and brand as factors
 
 
 ```r
-lmer_year_by_brand_MAPE <- lm(MAPE ~ device_year_c*Brand + Wear_Location, data = clean_data)
+lmer_year_by_brand_MAPE <- lm(MAPE ~ device_year_c*Brand + wear_location_c, data = clean_data)
 
 summary(lmer_year_by_brand_MAPE)
 ```
@@ -564,39 +609,38 @@ summary(lmer_year_by_brand_MAPE)
 ```
 ## 
 ## Call:
-## lm(formula = MAPE ~ device_year_c * Brand + Wear_Location, data = clean_data)
+## lm(formula = MAPE ~ device_year_c * Brand + wear_location_c, 
+##     data = clean_data)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -20.413  -8.126  -5.810  -0.009  91.867 
+## -20.441  -8.212  -5.786  -0.046  91.781 
 ## 
 ## Coefficients:
 ##                             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)                  21.0830    98.2397   0.215   0.8301    
-## device_year_c                -1.2577    19.4456  -0.065   0.9484    
-## BrandFitbit                  -3.2801    98.2594  -0.033   0.9734    
-## BrandGarmin                   7.1651    98.5879   0.073   0.9421    
-## BrandMisfit                  18.0624    98.4785   0.183   0.8545    
-## BrandPolar                   -2.1909    98.5460  -0.022   0.9823    
-## BrandSamsung                 -3.2497   104.5815  -0.031   0.9752    
-## BrandWithings                36.4653    99.5623   0.366   0.7143    
-## Wear_LocationThigh           10.2640    19.1565   0.536   0.5922    
-## Wear_LocationTorso           -3.2014     3.1954  -1.002   0.3167    
-## Wear_LocationUpper Arm      -18.6998     8.2401  -2.269   0.0235 *  
-## Wear_LocationWaist/Hip      -12.4205     2.7302  -4.549 6.10e-06 ***
-## Wear_LocationWrist          -13.1171     2.9387  -4.464 9.05e-06 ***
-## device_year_c:BrandFitbit     2.1746    19.4638   0.112   0.9111    
-## device_year_c:BrandGarmin    -1.0281    19.5378  -0.053   0.9580    
-## device_year_c:BrandMisfit    -4.0671    19.6516  -0.207   0.8361    
-## device_year_c:BrandPolar      1.3313    19.6061   0.068   0.9459    
-## device_year_c:BrandSamsung    0.7091    21.1142   0.034   0.9732    
-## device_year_c:BrandWithings  -9.5470    20.0041  -0.477   0.6333    
+## (Intercept)                  21.6070    98.1712   0.220    0.826    
+## device_year_c                -1.2577    19.4325  -0.065    0.948    
+## BrandFitbit                  -4.1070    98.1857  -0.042    0.967    
+## BrandGarmin                   7.1651    98.5211   0.073    0.942    
+## BrandMisfit                  18.0828    98.4118   0.184    0.854    
+## BrandPolar                   -2.1909    98.4792  -0.022    0.982    
+## BrandSamsung                 -3.2497   104.5106  -0.031    0.975    
+## BrandWithings                35.3613    99.4822   0.355    0.722    
+## wear_location_cTorso         -3.3633     3.1784  -1.058    0.290    
+## wear_location_cWaist/Hip    -12.5692     2.7109  -4.637 4.05e-06 ***
+## wear_location_cWrist_Arm    -13.6410     2.8725  -4.749 2.37e-06 ***
+## device_year_c:BrandFitbit     2.3539    19.4489   0.121    0.904    
+## device_year_c:BrandGarmin    -1.0281    19.5246  -0.053    0.958    
+## device_year_c:BrandMisfit    -4.1462    19.6379  -0.211    0.833    
+## device_year_c:BrandPolar      1.3313    19.5928   0.068    0.946    
+## device_year_c:BrandSamsung    0.7091    21.0999   0.034    0.973    
+## device_year_c:BrandWithings  -9.2904    19.9871  -0.465    0.642    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 19 on 925 degrees of freedom
-## Multiple R-squared:  0.07136,	Adjusted R-squared:  0.05328 
-## F-statistic: 3.949 on 18 and 925 DF,  p-value: 6.502e-08
+## Residual standard error: 18.99 on 927 degrees of freedom
+## Multiple R-squared:  0.07061,	Adjusted R-squared:  0.05457 
+## F-statistic: 4.402 on 16 and 927 DF,  p-value: 1.907e-08
 ```
 
 ```r
@@ -604,28 +648,26 @@ tidy(lmer_year_by_brand_MAPE, conf.int = TRUE)
 ```
 
 ```
-## # A tibble: 19 × 7
+## # A tibble: 17 × 7
 ##    term                        estimate std.er…¹ stati…² p.value conf.…³ conf.…⁴
 ##    <chr>                          <dbl>    <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-##  1 (Intercept)                   21.1      98.2   0.215  8.30e-1 -172.    214.  
+##  1 (Intercept)                   21.6      98.2   0.220  8.26e-1 -171.    214.  
 ##  2 device_year_c                 -1.26     19.4  -0.0647 9.48e-1  -39.4    36.9 
-##  3 BrandFitbit                   -3.28     98.3  -0.0334 9.73e-1 -196.    190.  
-##  4 BrandGarmin                    7.17     98.6   0.0727 9.42e-1 -186.    201.  
-##  5 BrandMisfit                   18.1      98.5   0.183  8.55e-1 -175.    211.  
-##  6 BrandPolar                    -2.19     98.5  -0.0222 9.82e-1 -196.    191.  
+##  3 BrandFitbit                   -4.11     98.2  -0.0418 9.67e-1 -197.    189.  
+##  4 BrandGarmin                    7.17     98.5   0.0727 9.42e-1 -186.    201.  
+##  5 BrandMisfit                   18.1      98.4   0.184  8.54e-1 -175.    211.  
+##  6 BrandPolar                    -2.19     98.5  -0.0222 9.82e-1 -195.    191.  
 ##  7 BrandSamsung                  -3.25    105.   -0.0311 9.75e-1 -208.    202.  
-##  8 BrandWithings                 36.5      99.6   0.366  7.14e-1 -159.    232.  
-##  9 Wear_LocationThigh            10.3      19.2   0.536  5.92e-1  -27.3    47.9 
-## 10 Wear_LocationTorso            -3.20      3.20 -1.00   3.17e-1   -9.47    3.07
-## 11 Wear_LocationUpper Arm       -18.7       8.24 -2.27   2.35e-2  -34.9    -2.53
-## 12 Wear_LocationWaist/Hip       -12.4       2.73 -4.55   6.10e-6  -17.8    -7.06
-## 13 Wear_LocationWrist           -13.1       2.94 -4.46   9.05e-6  -18.9    -7.35
-## 14 device_year_c:BrandFitbit      2.17     19.5   0.112  9.11e-1  -36.0    40.4 
-## 15 device_year_c:BrandGarmin     -1.03     19.5  -0.0526 9.58e-1  -39.4    37.3 
-## 16 device_year_c:BrandMisfit     -4.07     19.7  -0.207  8.36e-1  -42.6    34.5 
-## 17 device_year_c:BrandPolar       1.33     19.6   0.0679 9.46e-1  -37.1    39.8 
-## 18 device_year_c:BrandSamsung     0.709    21.1   0.0336 9.73e-1  -40.7    42.1 
-## 19 device_year_c:BrandWithings   -9.55     20.0  -0.477  6.33e-1  -48.8    29.7 
+##  8 BrandWithings                 35.4      99.5   0.355  7.22e-1 -160.    231.  
+##  9 wear_location_cTorso          -3.36      3.18 -1.06   2.90e-1   -9.60    2.87
+## 10 wear_location_cWaist/Hip     -12.6       2.71 -4.64   4.05e-6  -17.9    -7.25
+## 11 wear_location_cWrist_Arm     -13.6       2.87 -4.75   2.37e-6  -19.3    -8.00
+## 12 device_year_c:BrandFitbit      2.35     19.4   0.121  9.04e-1  -35.8    40.5 
+## 13 device_year_c:BrandGarmin     -1.03     19.5  -0.0527 9.58e-1  -39.3    37.3 
+## 14 device_year_c:BrandMisfit     -4.15     19.6  -0.211  8.33e-1  -42.7    34.4 
+## 15 device_year_c:BrandPolar       1.33     19.6   0.0679 9.46e-1  -37.1    39.8 
+## 16 device_year_c:BrandSamsung     0.709    21.1   0.0336 9.73e-1  -40.7    42.1 
+## 17 device_year_c:BrandWithings   -9.29     20.0  -0.465  6.42e-1  -48.5    29.9 
 ## # … with abbreviated variable names ¹​std.error, ²​statistic, ³​conf.low,
 ## #   ⁴​conf.high
 ```
@@ -645,7 +687,7 @@ plot(scatter_fitted_year_loc_brand)
 ## `geom_smooth()` using formula = 'y ~ x'
 ```
 
-![](device_validity_time_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+![](device_validity_time_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
 ## Subset of Fitbit data
 
@@ -658,7 +700,7 @@ clean_data_fitbit <- subset(clean_data, Brand == "Fitbit")
 
 
 ```r
-lm_year_MAPE_fb <- lm(MAPE ~ device_year_c + Wear_Location, data = clean_data_fitbit)
+lm_year_MAPE_fb <- lm(MAPE ~ device_year_c + wear_location_c, data = clean_data_fitbit)
 
 summary(lm_year_MAPE_fb)
 ```
@@ -666,27 +708,25 @@ summary(lm_year_MAPE_fb)
 ```
 ## 
 ## Call:
-## lm(formula = MAPE ~ device_year_c + Wear_Location, data = clean_data_fitbit)
+## lm(formula = MAPE ~ device_year_c + wear_location_c, data = clean_data_fitbit)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -20.112  -9.207  -7.137   0.303  90.784 
+## -20.346  -9.300  -6.911   0.437  90.672 
 ## 
 ## Coefficients:
-##                        Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)             17.4187     3.5858   4.858 1.52e-06 ***
-## device_year_c            1.0643     0.9426   1.129 0.259316    
-## Wear_LocationThigh      10.2060    20.5674   0.496 0.619921    
-## Wear_LocationTorso      -5.6854     3.4972  -1.626 0.104551    
-## Wear_LocationUpper Arm -18.4630     8.8576  -2.084 0.037549 *  
-## Wear_LocationWaist/Hip -11.3955     2.9608  -3.849 0.000132 ***
-## Wear_LocationWrist     -13.4375     3.2362  -4.152 3.77e-05 ***
+##                          Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)               17.1133     3.4796   4.918 1.13e-06 ***
+## device_year_c              1.2442     0.8905   1.397    0.163    
+## wear_location_cTorso      -5.8332     3.4773  -1.677    0.094 .  
+## wear_location_cWaist/Hip -11.5180     2.9382  -3.920 9.88e-05 ***
+## wear_location_cWrist_Arm -13.9742     3.1480  -4.439 1.08e-05 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 20.4 on 594 degrees of freedom
-## Multiple R-squared:  0.04062,	Adjusted R-squared:  0.03093 
-## F-statistic: 4.191 on 6 and 594 DF,  p-value: 0.0003859
+## Residual standard error: 20.37 on 596 degrees of freedom
+## Multiple R-squared:  0.03971,	Adjusted R-squared:  0.03327 
+## F-statistic: 6.162 on 4 and 596 DF,  p-value: 7.313e-05
 ```
 
 ```r
@@ -694,16 +734,14 @@ tidy(lm_year_MAPE_fb, conf.int = TRUE)
 ```
 
 ```
-## # A tibble: 7 × 7
-##   term                   estimate std.error statistic    p.value conf.…¹ conf.…²
-##   <chr>                     <dbl>     <dbl>     <dbl>      <dbl>   <dbl>   <dbl>
-## 1 (Intercept)               17.4      3.59      4.86  0.00000152  10.4     24.5 
-## 2 device_year_c              1.06     0.943     1.13  0.259       -0.787    2.92
-## 3 Wear_LocationThigh        10.2     20.6       0.496 0.620      -30.2     50.6 
-## 4 Wear_LocationTorso        -5.69     3.50     -1.63  0.105      -12.6      1.18
-## 5 Wear_LocationUpper Arm   -18.5      8.86     -2.08  0.0375     -35.9     -1.07
-## 6 Wear_LocationWaist/Hip   -11.4      2.96     -3.85  0.000132   -17.2     -5.58
-## 7 Wear_LocationWrist       -13.4      3.24     -4.15  0.0000377  -19.8     -7.08
+## # A tibble: 5 × 7
+##   term                     estimate std.error statistic  p.value conf.…¹ conf.…²
+##   <chr>                       <dbl>     <dbl>     <dbl>    <dbl>   <dbl>   <dbl>
+## 1 (Intercept)                 17.1      3.48       4.92  1.13e-6  10.3    23.9  
+## 2 device_year_c                1.24     0.890      1.40  1.63e-1  -0.505   2.99 
+## 3 wear_location_cTorso        -5.83     3.48      -1.68  9.40e-2 -12.7     0.996
+## 4 wear_location_cWaist/Hip   -11.5      2.94      -3.92  9.88e-5 -17.3    -5.75 
+## 5 wear_location_cWrist_Arm   -14.0      3.15      -4.44  1.08e-5 -20.2    -7.79 
 ## # … with abbreviated variable names ¹​conf.low, ²​conf.high
 ```
 
@@ -722,7 +760,78 @@ plot(scatter_fitted_fb)
 ## `geom_smooth()` using formula = 'y ~ x'
 ```
 
-![](device_validity_time_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+![](device_validity_time_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+
+## Subset of Non Fitbit data
+
+
+```r
+clean_data_no_fitbit <- subset(clean_data, Brand != "Fitbit")
+```
+
+### Model 5: Linear Regression - Device year as a predictor of Step Count MAPE
+
+
+```r
+lm_year_MAPE_no_fb <- lm(MAPE ~ device_year_c + wear_location_c, data = clean_data_no_fitbit)
+
+summary(lm_year_MAPE_no_fb)
+```
+
+```
+## 
+## Call:
+## lm(formula = MAPE ~ device_year_c + wear_location_c, data = clean_data_no_fitbit)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -44.859  -5.526  -4.136  -0.333  91.789 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                53.973      5.845   9.234  < 2e-16 ***
+## device_year_c              -2.531      0.779  -3.249  0.00127 ** 
+## wear_location_cWaist/Hip  -38.828      5.895  -6.587 1.71e-10 ***
+## wear_location_cWrist_Arm  -38.312      5.726  -6.691 9.18e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 15.59 on 339 degrees of freedom
+## Multiple R-squared:  0.1671,	Adjusted R-squared:  0.1597 
+## F-statistic: 22.67 on 3 and 339 DF,  p-value: 2.126e-13
+```
+
+```r
+tidy(lm_year_MAPE_no_fb, conf.int = TRUE)
+```
+
+```
+## # A tibble: 4 × 7
+##   term                     estimate std.error statistic  p.value conf.…¹ conf.…²
+##   <chr>                       <dbl>     <dbl>     <dbl>    <dbl>   <dbl>   <dbl>
+## 1 (Intercept)                 54.0      5.85       9.23 2.91e-18   42.5   65.5  
+## 2 device_year_c               -2.53     0.779     -3.25 1.27e- 3   -4.06  -0.999
+## 3 wear_location_cWaist/Hip   -38.8      5.89      -6.59 1.71e-10  -50.4  -27.2  
+## 4 wear_location_cWrist_Arm   -38.3      5.73      -6.69 9.18e-11  -49.6  -27.0  
+## # … with abbreviated variable names ¹​conf.low, ²​conf.high
+```
+
+```r
+clean_data_m5 <- augment(lm_year_MAPE_no_fb, newdata = clean_data_no_fitbit, interval = "prediction")
+
+scatter_fitted_no_fb <- ggplot(data = clean_data_m5, aes(x = device_year, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "gray") +
+      theme_bw()
+
+plot(scatter_fitted_no_fb)
+```
+
+```
+## `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](device_validity_time_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
 ## Table 2: Creating model table
 
@@ -732,38 +841,36 @@ m1 <- tbl_regression(lm_year_MAPE)
 m2 <- tbl_regression(lm_year_MAPE_loc) 
 m3 <- tbl_regression(lmer_year_by_brand_MAPE) 
 m4 <- tbl_regression(lm_year_MAPE_fb) 
+m5 <- tbl_regression(lm_year_MAPE_no_fb) 
 
-
-tbl_2_multi <- tbl_merge(list(m1, m2, m3, m4))
+tbl_2_multi <- tbl_merge(list(m1, m2, m3, m4, m5))
 
 tbl_2_multi %>% as_kable()
 ```
 
 
 
-|**Characteristic**       | **Beta** | **95% CI**  | **p-value** | **Beta** | **95% CI** | **p-value** | **Beta** | **95% CI** | **p-value** | **Beta** | **95% CI** | **p-value** |
-|:------------------------|:--------:|:-----------:|:-----------:|:--------:|:----------:|:-----------:|:--------:|:----------:|:-----------:|:--------:|:----------:|:-----------:|
-|device_year_c            |   -1.5   | -2.5, -0.54 |    0.002    |  -0.65   | -1.9, 0.61 |     0.3     |   -1.3   |  -39, 37   |    >0.9     |   1.1    | -0.79, 2.9 |     0.3     |
-|Wear_Location            |          |             |             |          |            |             |          |            |             |          |            |             |
-|LAF                      |          |             |             |    —     |     —      |             |    —     |     —      |             |    —     |     —      |             |
-|Thigh                    |          |             |             |    11    |  -27, 49   |     0.6     |    10    |  -27, 48   |     0.6     |    10    |  -30, 51   |     0.6     |
-|Torso                    |          |             |             |   -2.7   | -9.0, 3.6  |     0.4     |   -3.2   | -9.5, 3.1  |     0.3     |   -5.7   |  -13, 1.2  |    0.10     |
-|Upper Arm                |          |             |             |   -21    | -37, -5.1  |    0.010    |   -19    | -35, -2.5  |    0.023    |   -18    | -36, -1.1  |    0.038    |
-|Waist/Hip                |          |             |             |   -12    | -17, -6.7  |   <0.001    |   -12    | -18, -7.1  |   <0.001    |   -11    | -17, -5.6  |   <0.001    |
-|Wrist                    |          |             |             |   -13    | -18, -7.1  |   <0.001    |   -13    | -19, -7.3  |   <0.001    |   -13    | -20, -7.1  |   <0.001    |
-|Brand                    |          |             |             |          |            |             |          |            |             |          |            |             |
-|Apple                    |          |             |             |          |            |             |    —     |     —      |             |          |            |             |
-|Fitbit                   |          |             |             |          |            |             |   -3.3   | -196, 190  |    >0.9     |          |            |             |
-|Garmin                   |          |             |             |          |            |             |   7.2    | -186, 201  |    >0.9     |          |            |             |
-|Misfit                   |          |             |             |          |            |             |    18    | -175, 211  |     0.9     |          |            |             |
-|Polar                    |          |             |             |          |            |             |   -2.2   | -196, 191  |    >0.9     |          |            |             |
-|Samsung                  |          |             |             |          |            |             |   -3.2   | -208, 202  |    >0.9     |          |            |             |
-|Withings                 |          |             |             |          |            |             |    36    | -159, 232  |     0.7     |          |            |             |
-|device_year_c * Brand    |          |             |             |          |            |             |          |            |             |          |            |             |
-|device_year_c * Fitbit   |          |             |             |          |            |             |   2.2    |  -36, 40   |    >0.9     |          |            |             |
-|device_year_c * Garmin   |          |             |             |          |            |             |   -1.0   |  -39, 37   |    >0.9     |          |            |             |
-|device_year_c * Misfit   |          |             |             |          |            |             |   -4.1   |  -43, 34   |     0.8     |          |            |             |
-|device_year_c * Polar    |          |             |             |          |            |             |   1.3    |  -37, 40   |    >0.9     |          |            |             |
-|device_year_c * Samsung  |          |             |             |          |            |             |   0.71   |  -41, 42   |    >0.9     |          |            |             |
-|device_year_c * Withings |          |             |             |          |            |             |   -9.5   |  -49, 30   |     0.6     |          |            |             |
+|**Characteristic**       | **Beta** | **95% CI**  | **p-value** | **Beta** | **95% CI** | **p-value** | **Beta** | **95% CI** | **p-value** | **Beta** | **95% CI** | **p-value** | **Beta** | **95% CI** | **p-value** |
+|:------------------------|:--------:|:-----------:|:-----------:|:--------:|:----------:|:-----------:|:--------:|:----------:|:-----------:|:--------:|:----------:|:-----------:|:--------:|:----------:|:-----------:|
+|device_year_c            |   -1.5   | -2.5, -0.54 |    0.002    |  -0.47   | -1.7, 0.74 |     0.4     |   -1.3   |  -39, 37   |    >0.9     |   1.2    | -0.50, 3.0 |     0.2     |   -2.5   | -4.1, -1.0 |    0.001    |
+|wear_location_c          |          |             |             |          |            |             |          |            |             |          |            |             |          |            |             |
+|Leg_Thigh                |          |             |             |    —     |     —      |             |    —     |     —      |             |    —     |     —      |             |          |            |             |
+|Torso                    |          |             |             |   -2.9   | -9.1, 3.4  |     0.4     |   -3.4   | -9.6, 2.9  |     0.3     |   -5.8   |  -13, 1.0  |    0.094    |    —     |     —      |             |
+|Waist/Hip                |          |             |             |   -12    | -17, -6.9  |   <0.001    |   -13    | -18, -7.2  |   <0.001    |   -12    | -17, -5.7  |   <0.001    |   -39    |  -50, -27  |   <0.001    |
+|Wrist_Arm                |          |             |             |   -13    | -18, -7.7  |   <0.001    |   -14    | -19, -8.0  |   <0.001    |   -14    | -20, -7.8  |   <0.001    |   -38    |  -50, -27  |   <0.001    |
+|Brand                    |          |             |             |          |            |             |          |            |             |          |            |             |          |            |             |
+|Apple                    |          |             |             |          |            |             |    —     |     —      |             |          |            |             |          |            |             |
+|Fitbit                   |          |             |             |          |            |             |   -4.1   | -197, 189  |    >0.9     |          |            |             |          |            |             |
+|Garmin                   |          |             |             |          |            |             |   7.2    | -186, 201  |    >0.9     |          |            |             |          |            |             |
+|Misfit                   |          |             |             |          |            |             |    18    | -175, 211  |     0.9     |          |            |             |          |            |             |
+|Polar                    |          |             |             |          |            |             |   -2.2   | -195, 191  |    >0.9     |          |            |             |          |            |             |
+|Samsung                  |          |             |             |          |            |             |   -3.2   | -208, 202  |    >0.9     |          |            |             |          |            |             |
+|Withings                 |          |             |             |          |            |             |    35    | -160, 231  |     0.7     |          |            |             |          |            |             |
+|device_year_c * Brand    |          |             |             |          |            |             |          |            |             |          |            |             |          |            |             |
+|device_year_c * Fitbit   |          |             |             |          |            |             |   2.4    |  -36, 41   |    >0.9     |          |            |             |          |            |             |
+|device_year_c * Garmin   |          |             |             |          |            |             |   -1.0   |  -39, 37   |    >0.9     |          |            |             |          |            |             |
+|device_year_c * Misfit   |          |             |             |          |            |             |   -4.1   |  -43, 34   |     0.8     |          |            |             |          |            |             |
+|device_year_c * Polar    |          |             |             |          |            |             |   1.3    |  -37, 40   |    >0.9     |          |            |             |          |            |             |
+|device_year_c * Samsung  |          |             |             |          |            |             |   0.71   |  -41, 42   |    >0.9     |          |            |             |          |            |             |
+|device_year_c * Withings |          |             |             |          |            |             |   -9.3   |  -49, 30   |     0.6     |          |            |             |          |            |             |
 

@@ -131,7 +131,6 @@ plot(histo_MAPE_SC)
 
 The histogram indicates that the MAPE values are not normally distributed and that there is an extreme positive skewness. Majority of the MAPE values lie to the left of the distribution. The mean is likely not be a good measure of central tendency for this data because of the degree of skewness seen in the histogram. Therefore, we will want to use the median value instead.
 
-
 ### Scatter plot for SC MAPE for all brands compared to device years of release
 
 ```{r}
@@ -154,6 +153,8 @@ scatter_MAPE_year_Brand <- ggplot(data = clean_data, aes(x = device_year, y = MA
       geom_point(alpha = 0.2) +
       stat_smooth(method = "lm", colour = "gray") +
       facet_wrap(~ Brand) +
+      labs(y = "Mean Absolute Percent Error (MAPE)",
+           x = "Device Release Year") +
       theme_bw()
 
 plot(scatter_MAPE_year_Brand)
@@ -175,6 +176,24 @@ clean_data <- clean_data %>%
 		device_year == 2016 ~ 6,
 	))
 summary(clean_data$device_year_c)
+```
+
+## Recoding device year as continuous 
+
+```{r}
+table(clean_data$Wear_Location)
+
+clean_data <- clean_data %>%
+	mutate(wear_location_c = case_when(
+		Wear_Location == "LAF" ~ "Leg_Thigh",
+		Wear_Location == "Thigh" ~ "Leg_Thigh",
+		Wear_Location == "Torso" ~ "Torso",
+		Wear_Location == "Upper Arm" ~ "Wrist_Arm",
+		Wear_Location == "Waist/Hip" ~ "Waist/Hip",
+		Wear_Location == "Wrist" ~ "Wrist_Arm",
+	))
+
+table(clean_data$wear_location_c)
 ```
 
 ## Model 1: Linear Regression Device year as a predictor of Step Count MAPE
@@ -199,7 +218,7 @@ ggsave("scatter_fitted_year.pdf", scatter_fitted_year, dpi = 300)
 ## Model 2: Linear Regression - Device year as a predictor of Step Count MAPE + Wear location control
 
 ```{r}
-lm_year_MAPE_loc <- lm(MAPE ~ device_year_c + Wear_Location, data = clean_data, na.action = na.exclude)
+lm_year_MAPE_loc <- lm(MAPE ~ device_year_c + wear_location_c, data = clean_data, na.action = na.exclude)
 
 summary(lm_year_MAPE_loc)
 tidy(lm_year_MAPE_loc, conf.int = TRUE)
@@ -217,7 +236,7 @@ plot(scatter_fitted_year_loc)
 ## Model 3:  Linear Regression - Analyzing differences in SC MAPE with device year and brand as factors
 
 ```{r}
-lmer_year_by_brand_MAPE <- lm(MAPE ~ device_year_c*Brand + Wear_Location, data = clean_data)
+lmer_year_by_brand_MAPE <- lm(MAPE ~ device_year_c*Brand + wear_location_c, data = clean_data)
 
 summary(lmer_year_by_brand_MAPE)
 tidy(lmer_year_by_brand_MAPE, conf.int = TRUE)
@@ -241,7 +260,7 @@ clean_data_fitbit <- subset(clean_data, Brand == "Fitbit")
 ### Model 4: Linear Regression - Device year as a predictor of Step Count MAPE
 
 ```{r}
-lm_year_MAPE_fb <- lm(MAPE ~ device_year_c + Wear_Location, data = clean_data_fitbit)
+lm_year_MAPE_fb <- lm(MAPE ~ device_year_c + wear_location_c, data = clean_data_fitbit)
 
 summary(lm_year_MAPE_fb)
 tidy(lm_year_MAPE_fb, conf.int = TRUE)
@@ -256,6 +275,30 @@ scatter_fitted_fb <- ggplot(data = clean_data_m4, aes(x = device_year, y = MAPE)
 plot(scatter_fitted_fb)
 ```
 
+## Subset of Non Fitbit data
+
+```{r}
+clean_data_no_fitbit <- subset(clean_data, Brand != "Fitbit")
+```
+
+### Model 5: Linear Regression - Device year as a predictor of Step Count MAPE
+
+```{r}
+lm_year_MAPE_no_fb <- lm(MAPE ~ device_year_c + wear_location_c, data = clean_data_no_fitbit)
+
+summary(lm_year_MAPE_no_fb)
+tidy(lm_year_MAPE_no_fb, conf.int = TRUE)
+
+clean_data_m5 <- augment(lm_year_MAPE_no_fb, newdata = clean_data_no_fitbit, interval = "prediction")
+
+scatter_fitted_no_fb <- ggplot(data = clean_data_m5, aes(x = device_year, y = MAPE)) +
+      geom_point(alpha = 0.2) +
+      stat_smooth(method = "lm", colour = "gray") +
+      theme_bw()
+
+plot(scatter_fitted_no_fb)
+```
+
 ## Table 2: Creating model table
 
 ```{r}
@@ -263,9 +306,9 @@ m1 <- tbl_regression(lm_year_MAPE)
 m2 <- tbl_regression(lm_year_MAPE_loc) 
 m3 <- tbl_regression(lmer_year_by_brand_MAPE) 
 m4 <- tbl_regression(lm_year_MAPE_fb) 
+m5 <- tbl_regression(lm_year_MAPE_no_fb) 
 
-
-tbl_2_multi <- tbl_merge(list(m1, m2, m3, m4))
+tbl_2_multi <- tbl_merge(list(m1, m2, m3, m4, m5))
 
 tbl_2_multi %>% as_kable()
 ```
